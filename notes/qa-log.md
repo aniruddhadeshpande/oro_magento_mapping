@@ -104,3 +104,9 @@ Two causes. (1) The flag was put in the `x-php` anchor block, but `php:` has its
 
 ### Module 0 Phase A smoke test passed (2026-10-21)
 `/`, `/admin/user/login` and `/product/` return 200. 64 sample products, MQ empty, consumer running. Mailcatcher UI: `docker compose port mailcatcher 1080`.
+
+### Where is X in Oro (folders, DB creds, config)?
+See **[oro-folder-structure.md](oro-folder-structure.md)**: top-level dirs, "where is X?" table, bundle anatomy, themes, where custom code goes.
+
+### Push to my own remote fails: "did not receive expected object … index-pack failed"
+The repo was a **shallow clone** (`git fetch --depth 1`). The missing object was the parent of the 5.1.8 commit, which the shallow clone cut off, and GitHub rejects a pushed history with missing parents. Fix: `git fetch --unshallow origin` (13 MB), then `git push -u local study`. Push only your branch and tag, not `--tags` (that would push all of Oro's release tags). Bonus: the `7.0.4` tag is now local, so `git diff 5.1.8 7.0.4` works.
