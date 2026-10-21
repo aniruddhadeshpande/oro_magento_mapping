@@ -1,0 +1,25 @@
+x-php: &php                     # shared settings (YAML anchor)
+  image: oro-study/php:8.2
+  user: "1001:1001"
+  working_dir: /var/www/oro
+  volumes:
+    - .:/var/www/oro
+  environment:
+    ORO_DB_URL: "postgres://oro_db_user:oro_db_pass@pgsql:5432/oro_db?sslmode=disable&charset=utf8&serverVersion=13.7"
+    ORO_REDIS_URL: "redis://redis:6379"
+    ORO_MAILER_DSN: "smtp://mailcatcher:1025"
+  depends_on:
+    pgsql:
+      condition: service_healthy
+
+services:
+  php:
+    <<: *php
+    build: .docker/php-8.2
+    ports: ["80:8000"]
+    command: symfony serve --no-tls --allow-all-ip --port=8000 --passthru=index.php
+
+  consumer:
+    <<: *php
+    restart: unless-stopped
+    command: symfony console oro:message-queue:consume --memory-limit=500 --time-limit=+1hour -vv 
