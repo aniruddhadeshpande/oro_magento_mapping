@@ -2,6 +2,7 @@ x-php: &php                     # shared settings (YAML anchor)
   image: oro-study/php:8.2
   user: "1001:1001"
   working_dir: /var/www/oro
+  restart: unless-stopped       # come back after a host reboot / Docker restart
   volumes:
     - .:/var/www/oro
   environment:
@@ -21,5 +22,13 @@ services:
 
   consumer:
     <<: *php
-    restart: unless-stopped
     command: symfony console oro:message-queue:consume --memory-limit=500 --time-limit=+1hour -vv 
+
+  # Oro's own services: only add a restart policy (Oro's file stays untouched).
+  # pgsql has `on-failure` there, which doesn't bring it back after a clean shutdown.
+  pgsql:
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped
+  mailcatcher:
+    restart: unless-stopped
