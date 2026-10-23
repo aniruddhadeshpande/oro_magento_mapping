@@ -1,0 +1,659 @@
+<title>Oro Request Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: tabbed trace viewer. Lanes (participants) stacked vertically on the left with a live wire; step detail on the right; full step log below. */
+:root {
+  --bg: #F3F5F7;
+  --surface: #FFFFFF;
+  --ink: #16212B;
+  --muted: #5A6876;
+  --line: #D4DBE2;
+  --accent: #0A6A8C;
+  --accent-soft: #DDEEF5;
+  --mage: #9C4F1C;
+  --mage-soft: #F7EADF;
+  --ok: #2F7A4F;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E151B; --surface: #151F28; --ink: #E2E9EF; --muted: #93A2AF; --line: #293845;
+    --accent: #52B9DE; --accent-soft: #122F3B; --mage: #E39D64; --mage-soft: #33241A; --ok: #6CC791;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E151B; --surface: #151F28; --ink: #E2E9EF; --muted: #93A2AF; --line: #293845;
+  --accent: #52B9DE; --accent-soft: #122F3B; --mage: #E39D64; --mage-soft: #33241A; --ok: #6CC791;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(28px, 4.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 20px; font-weight: 600; }
+h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+p { margin: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; color: var(--accent); letter-spacing: 0.04em; }
+header { display: flex; flex-direction: column; gap: 8px; }
+header p { color: var(--muted); max-width: 68ch; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tab {
+  appearance: none; border: 0; background: none; color: var(--muted); cursor: pointer;
+  font: 600 15px/1.2 var(--font-display); padding: 10px 12px 11px; border-bottom: 3px solid transparent; margin-bottom: -1px;
+  display: flex; gap: 8px; align-items: baseline;
+}
+.tab .mono { font-size: 12px; font-weight: 500; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.keyidea { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.keyidea > div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.keyidea .mageside { background: var(--mage-soft); border-color: transparent; }
+.keyidea .mageside h3 { color: var(--mage); }
+
+/* Player */
+.player { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 18px; align-items: start; }
+.stagecol { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn {
+  appearance: none; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font: 500 14px/1 var(--font-body); padding: 9px 12px; border-radius: 6px; display: inline-flex; gap: 6px; align-items: center;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); min-width: 92px; justify-content: center; }
+.counter { margin-left: auto; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.progress { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .35s ease; }
+
+.stage { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px 10px 0; }
+.stage svg { position: absolute; left: 0; top: 0; width: 46px; height: 100%; overflow: visible; pointer-events: none; }
+.lanes { display: flex; flex-direction: column; gap: 4px; }
+.lane {
+  margin-left: 46px; padding: 7px 10px; border-radius: 6px; border: 1px solid transparent;
+  display: flex; flex-direction: column; gap: 1px; transition: background .25s, border-color .25s, opacity .25s; opacity: .55;
+}
+.lane b { font: 600 14px/1.25 var(--font-display); }
+.lane span { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+.lane.seen { opacity: .9; }
+.lane.from { opacity: 1; border-color: var(--line); }
+.lane.to { opacity: 1; background: var(--accent-soft); border-color: var(--accent); }
+.wire { fill: none; stroke: var(--accent); stroke-width: 2.25; }
+.wire-back { fill: none; stroke: var(--line); stroke-width: 2; }
+.dot { fill: var(--accent); }
+.arrowhead { fill: var(--accent); }
+
+/* Detail card */
+.detail { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.detail .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.num { font: 700 30px/1 var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.phase { font-family: var(--font-mono); font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.route { font-size: 13px; color: var(--muted); }
+.route b { color: var(--ink); font-weight: 600; }
+.act { font: 600 21px/1.25 var(--font-display); overflow-wrap: anywhere; }
+.what { max-width: 64ch; }
+.ref { display: flex; flex-direction: column; gap: 4px; }
+.ref code { display: block; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mage { background: var(--mage-soft); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.mage h3 { color: var(--mage); }
+.diff { border-left: 3px solid var(--ok); padding-left: 10px; font-size: 14px; }
+.diff h3 { color: var(--ok); }
+
+/* Step log */
+.log { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px 22px; }
+.log section { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.log ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.log button {
+  appearance: none; width: 100%; text-align: left; cursor: pointer; border: 0; background: none; color: var(--muted);
+  font: 14px/1.35 var(--font-body); padding: 5px 8px; border-radius: 5px; display: grid; grid-template-columns: 2.2em minmax(0, 1fr); gap: 4px;
+}
+.log button .n { font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.log button:hover { background: var(--surface); color: var(--ink); }
+.log button.done { color: var(--ink); }
+.log button.current { background: var(--accent-soft); color: var(--ink); }
+.log button.current .n { color: var(--accent); font-weight: 500; }
+
+.try { display: flex; flex-direction: column; gap: 8px; }
+.cmd { display: flex; gap: 8px; align-items: stretch; }
+.cmd code { flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; overflow-x: auto; white-space: nowrap; }
+.cmd .btn { padding: 6px 10px; font-size: 13px; }
+.watch { background: var(--mage-soft); border-radius: 8px; padding: 12px 14px; font-size: 14px; }
+footer { border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); font-size: 14px; max-width: 80ch; }
+footer h3 { color: var(--ink); }
+kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--surface); }
+.hint { font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 820px) {
+  .player { grid-template-columns: minmax(0, 1fr); }
+  .keyidea { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">OroCommerce 5.1.8 CE · traced in vendor/ · notes/trace-request-flow.md</div>
+    <h1>Oro Request Flow</h1>
+    <p>Step through how a URL becomes HTML in Oro, one hop at a time. Every step shows the real file and line in <code>vendor/</code> and the closest Magento 2 equivalent. Paths are shortened as in the note: <code>platform/</code>, <code>commerce/</code>, <code>portal/</code>.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <div class="keyidea">
+    <div><h3>Key idea</h3><p id="keyidea"></p></div>
+    <div class="mageside"><h3>Coming from Magento</h3><p id="analogy"></p></div>
+  </div>
+
+  <div class="player">
+    <div class="stagecol">
+      <div class="controls">
+        <button class="btn" id="prev" aria-label="Previous step">← Back</button>
+        <button class="btn primary" id="play">▶ Play</button>
+        <button class="btn" id="next" aria-label="Next step">Next →</button>
+        <span class="counter" id="counter"></span>
+      </div>
+      <div class="progress"><i id="bar"></i></div>
+      <div class="stage" id="stage">
+        <svg id="wire" aria-hidden="true"></svg>
+        <div class="lanes" id="lanes"></div>
+      </div>
+      <p class="hint"><kbd>←</kbd> <kbd>→</kbd> step · <kbd>Space</kbd> play/pause · click any step in the log</p>
+    </div>
+
+    <article class="detail" id="detail" aria-live="polite">
+      <div class="top"><span class="num" id="d-num"></span><span class="phase" id="d-phase"></span></div>
+      <div class="route" id="d-route"></div>
+      <div class="act" id="d-act"></div>
+      <p class="what" id="d-what"></p>
+      <div class="ref" id="d-refbox"><h3>In the code</h3><code id="d-ref"></code></div>
+      <div class="mage"><h3>Magento 2</h3><p id="d-mage"></p></div>
+      <div class="diff" id="d-diffbox"><h3>Key difference</h3><p id="d-diff"></p></div>
+    </article>
+  </div>
+
+  <div>
+    <h2 style="margin-bottom:10px">Step log</h2>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="watch" id="watch" hidden></div>
+
+  <div class="try">
+    <h2>See it yourself</h2>
+    <div id="cmds" class="try"></div>
+  </div>
+
+  <footer>
+    <h3>EE note</h3>
+    <p>The request flow is the same in Enterprise Edition. The differences are inside the steps: website resolution picks the theme and config per website (multi-website), ACL checks include organization ownership, the datagrid applies organization and website scoping, and storefront product data usually comes from Elasticsearch (website search) rather than the ORM.</p>
+  </footer>
+</div>
+
+<script>
+const DIAGRAMS = {
+  d1: {
+    tab: "Storefront page", code: "D1",
+    key: "The storefront controller doesn't render anything. It returns data. The page is assembled from layout-update YAML files, chosen by theme + route name, that any bundle can contribute.",
+    analogy: "Like a Magento frontend Page result with layout handles, except the controller returns a plain array and the layout is YAML picked by route name instead of XML picked by full action name.",
+    lanes: [
+      { id: "B", name: "Browser", code: "GET /cms/page/view/1" },
+      { id: "S", name: "symfony serve", code: "php-cgi, --passthru=index.php" },
+      { id: "FC", name: "Front controller", code: "public/index.php" },
+      { id: "K", name: "Kernel", code: "AppKernel / OroKernel" },
+      { id: "HK", name: "HttpKernel + EventDispatcher", code: "kernel.request / .controller / .view" },
+      { id: "C", name: "Frontend controller", code: "PageController::viewAction" },
+      { id: "LL", name: "LayoutListener", code: "kernel.view, priority 10" },
+      { id: "LM", name: "LayoutManager / LayoutBuilder", code: "layout updates → block tree" },
+      { id: "T", name: "Twig layout renderer", code: "block themes *.html.twig" }
+    ],
+    steps: [
+      { f: "B", t: "S", phase: "boot", act: "GET http://oro.demo/cms/page/view/1",
+        what: "The browser hits port 80, which Docker maps to symfony serve on port 8000 inside the php container.",
+        ref: "docker-compose.override.yml  →  ports: [\"80:8000\"]",
+        mage: "nginx or Apache receives the request for the storefront URL." },
+      { f: "S", t: "FC", phase: "boot", act: "Hand the request to public/index.php",
+        what: "Any URL that isn't a real file goes to index.php because of --passthru=index.php. Without the flag, symfony serve tried index_dev.php and returned 403.",
+        ref: "symfony serve --no-tls --allow-all-ip --port=8000 --passthru=index.php",
+        mage: "nginx try_files falls back to pub/index.php." },
+      { f: "FC", t: "K", phase: "boot", act: "new AppKernel(ORO_ENV, ORO_DEBUG)",
+        what: "The Symfony Runtime component boots the kernel. Environment and debug flag come from env vars, which is why the site runs in prod mode.",
+        ref: "public/index.php:5-7",
+        mage: "Bootstrap::create() then createApplication(Http::class).",
+        diff: "No area code here. Storefront vs admin is decided later, per route." },
+      { f: "K", t: "K", phase: "boot", act: "registerBundles() reads every bundles.yml",
+        what: "OroKernel scans src/ and vendor/ for Resources/config/oro/bundles.yml, sorts by priority and caches the list in var/cache/prod/bundles.php.",
+        ref: "platform/Bundle/DistributionBundle/OroKernel.php:123",
+        mage: "registration.php (ComponentRegistrar) + the enabled list in app/etc/config.php.",
+        diff: "No enabled/disabled flag. If the file exists, the bundle loads. A new bundle shows up only after cache:clear." },
+      { f: "K", t: "HK", phase: "boot", act: "handle(Request)",
+        what: "The kernel builds the container (from cache) and passes the request to Symfony's HttpKernel, which drives everything through events.",
+        ref: "Symfony HttpKernel::handle()",
+        mage: "Http::launch() calls FrontController::dispatch()." },
+      { f: "HK", t: "HK", phase: "kernel.request", act: "RouterListener matches oro_cms_frontend_page_view",
+        what: "Routes come from each bundle's Resources/config/oro/routing.yml through the oro_auto loader. Routes without frontend: true got /admin prepended when the route cache was built.",
+        ref: "platform/…/OroAutoLoader.php:18\nplatform/…/RouteCollectionListener.php:37",
+        mage: "FrontController loops the RouterList and matches the routes.xml frontName.",
+        diff: "Routing is one flat Symfony route table, compiled and cached. The /admin prefix is added at build time, not by a separate admin router." },
+      { f: "HK", t: "HK", phase: "kernel.request", act: "ThemeListener sets _theme = default",
+        what: "The storefront theme is stored as a request attribute. Later, layout updates are collected from this theme and its parents.",
+        ref: "ThemeListener.php:35-45",
+        mage: "The design theme is resolved from config for the frontend area (DesignLoader)." },
+      { f: "HK", t: "HK", phase: "kernel.controller", act: "@Layout stored as request attribute _layout",
+        what: "The @Layout annotation on the action is read and saved on the request, so LayoutListener knows to build a layout from the returned data.",
+        ref: "platform/…/Annotation/Layout.php:160-162",
+        mage: "No direct equivalent. Closest: the action deciding to return a Page result via resultPageFactory." },
+      { f: "HK", t: "C", phase: "controller", act: "viewAction(Page $page)",
+        what: "The ParamConverter has already loaded the Page entity from the {id} in the URL, so the action receives a ready object.",
+        ref: "commerce/CMSBundle/Controller/Frontend/PageController.php:18",
+        mage: "Action::execute(). You load the model yourself through a repository." },
+      { f: "C", t: "HK", phase: "controller", act: "return ['data' => ['page' => $page]]",
+        what: "An array, not a Response. HttpKernel sees no Response and fires kernel.view.",
+        ref: "PageController.php:33",
+        mage: "return $resultPage;",
+        diff: "The controller has no idea which blocks or templates will render." },
+      { f: "HK", t: "LL", phase: "kernel.view", act: "LayoutListener::onKernelView()",
+        what: "Registered on kernel.view with priority 10. It only acts if the request has the _layout attribute.",
+        ref: "platform/…/LayoutListener.php:48\nview_annotations.yml:8",
+        mage: "App\\Http calls renderResult() on the returned result object." },
+      { f: "LL", t: "LL", phase: "kernel.view", act: "Build the LayoutContext",
+        what: "The returned data goes into a LayoutContext. Context configurators add theme, route_name and action.",
+        ref: "RouteContextConfigurator.php:29",
+        mage: "Layout handles are added: default, then the full action name (cms_page_view).",
+        diff: "route_name plays the role of Magento's full action name handle." },
+      { f: "LL", t: "LM", phase: "kernel.view", act: "getLayout(context)",
+        what: "The LayoutManager asks the LayoutBuilder to build a layout for this context.",
+        ref: "LayoutManager.php:15\nLayoutBuilder.php:204",
+        mage: "$page->getLayout() on Magento\\Framework\\View\\Layout." },
+      { f: "LM", t: "LM", phase: "kernel.view", act: "Collect layout updates",
+        what: "Looks in layouts/default/, layouts/default/{action}/ and layouts/default/{route_name}/ of every bundle, across the theme hierarchy.",
+        ref: "ThemePathProvider.php:38-75",
+        mage: "Merge layout XML for every handle across modules, with theme fallback." },
+      { f: "LM", t: "LM", phase: "kernel.view", act: "Apply YAML actions, build the block tree",
+        what: "@add, @setOption, @move, @remove build a tree of blocks. Each block type then builds a BlockView with its variables.",
+        ref: "layouts/default/<route_name>/*.yml",
+        mage: "Generate blocks and containers from the merged XML (<block>, <referenceContainer>, <move>, <remove>)." },
+      { f: "LM", t: "T", phase: "kernel.view", act: "Layout::render()",
+        what: "The finished BlockView tree goes to the Twig layout renderer.",
+        ref: "Layout.php:49-61",
+        mage: "Layout::getOutput()." },
+      { f: "T", t: "T", phase: "kernel.view", act: "renderBlock(root) with block themes",
+        what: "Each block is rendered by a Twig block named after its type or id, like {% block xxx_widget %}, from the block-theme files.",
+        ref: "*.html.twig  →  {% block xxx_widget %}",
+        mage: "Block::toHtml() renders each block's .phtml template.",
+        diff: "No block PHP class per template. Block types are reusable, and the markup lives in Twig blocks." },
+      { f: "T", t: "LL", phase: "kernel.view", act: "HTML string",
+        what: "The renderer returns the full page HTML to the listener.",
+        ref: "", mage: "The rendered page body." },
+      { f: "LL", t: "HK", phase: "kernel.view", act: "new Response(html)",
+        what: "The listener sets the Response on the event, which stops kernel.view.",
+        ref: "LayoutListener.php:139",
+        mage: "The Page result writes the HTML into the Response body." },
+      { f: "HK", t: "B", phase: "response", act: "200 text/html",
+        what: "kernel.response listeners run (headers, cache), then the response is sent.",
+        ref: "", mage: "Response::sendResponse()." }
+    ],
+    cmds: [
+      "docker compose exec php symfony console debug:router oro_cms_frontend_page_view",
+      "docker compose exec php symfony console debug:event-dispatcher kernel.view",
+      "docker compose exec php symfony console oro:debug:storefront-routes | head",
+      "docker compose exec php symfony console oro:debug:layout:block-types",
+      "docker compose exec php symfony console oro:debug:layout --type=container"
+    ]
+  },
+
+  d2: {
+    tab: "Admin page + datagrid", code: "D2",
+    key: "The admin side is classic Symfony: controller → Twig. The grid is configured in YAML, not code. The first page is rendered on the server into the HTML, and every later sort or filter is an XHR to the generic oro_datagrid_index route.",
+    analogy: "Closest to a Magento UI-component listing (*_listing.xml + mui/index/render). In Oro there's no data-provider PHP class unless you need one.",
+    lanes: [
+      { id: "B", name: "Browser", code: "GET /admin/brand/" },
+      { id: "HK", name: "HttpKernel", code: "router + listeners" },
+      { id: "C", name: "Admin controller", code: "BrandController::indexAction" },
+      { id: "TW", name: "Twig (admin templates)", code: "@OroProduct/Brand/index.html.twig" },
+      { id: "DGM", name: "Datagrid Manager", code: "datagrids.yml → grid object" },
+      { id: "DS", name: "OrmDatasource", code: "DQL query builder" },
+      { id: "GC", name: "GridController", code: "route oro_datagrid_index" }
+    ],
+    steps: [
+      { f: "B", t: "HK", phase: "first page load", act: "GET /admin/brand/",
+        what: "The route has no frontend: true option, so it got the /admin prefix when the route cache was built.",
+        ref: "RouteCollectionListener.php:37",
+        mage: "An adminhtml URL whose frontName comes from etc/adminhtml/routes.xml." },
+      { f: "HK", t: "C", phase: "first page load", act: "BrandController::indexAction",
+        what: "Annotations on the action: @Route for the URL, @Template for the view, and an ACL check.",
+        ref: "BrandController.php:25-35  (@Route + @Template)",
+        mage: "An Adminhtml controller with execute() and an _isAllowed() / ADMIN_RESOURCE check." },
+      { f: "C", t: "HK", phase: "first page load", act: "return [] (or ['entity_class' => …])",
+        what: "The action returns an array of template variables. The grid isn't mentioned at all.",
+        ref: "", mage: "return $resultPage;" },
+      { f: "HK", t: "TW", phase: "first page load", act: "@Template renders index.html.twig",
+        what: "Symfony's template listener renders the Twig file named in @Template with the returned array.",
+        ref: "@OroProduct/Brand/index.html.twig",
+        mage: "Layout XML (brand_index_index.xml) adds the listing UI component.",
+        diff: "Admin uses Twig templates directly. The layout-YAML system from D1 is storefront-only." },
+      { f: "TW", t: "TW", phase: "first page load", act: "dataGrid.renderGrid('brand-grid')",
+        what: "A Twig macro from DataGridBundle places the grid on the page by name.",
+        ref: "DataGridBundle macros.html.twig:9",
+        mage: "<uiComponent name=\"brand_listing\"/>" },
+      { f: "TW", t: "DGM", phase: "first page load", act: "oro_datagrid_data(datagrid)",
+        what: "A Twig function asks the datagrid system for the grid's data.",
+        ref: "macros.html.twig:43\nDataGridExtension.php:106,169",
+        mage: "The listing's DataProvider::getData()." },
+      { f: "DGM", t: "DGM", phase: "first page load", act: "getDatagrid(name) reads datagrids.yml",
+        what: "The grid config is merged from every bundle's Resources/config/oro/datagrids.yml, so other bundles can extend a grid.",
+        ref: "Manager.php:53\nRawConfigurationProvider.php:23",
+        mage: "Merging *_listing.xml from every module.",
+        diff: "Columns, filters, sorters and the query all live in one YAML block. No PHP class needed for a simple grid." },
+      { f: "DGM", t: "DS", phase: "first page load", act: "Build the query",
+        what: "source.query is a DQL definition (select, from, join). Filters and sorters from the request are applied on top.",
+        ref: "datagrids.yml → source: { type: orm, query: … }",
+        mage: "A collection with addFieldToFilter() / setOrder() from the request params." },
+      { f: "DS", t: "DGM", phase: "first page load", act: "getResults()",
+        what: "The datasource runs the query and returns result records.",
+        ref: "OrmDatasource.php:87",
+        mage: "$collection->load()." },
+      { f: "DGM", t: "TW", phase: "first page load", act: "First page embedded as JSON",
+        what: "Grid metadata (columns, filters) and the first page of rows go into the data-page-component-options attribute.",
+        ref: "macros.html.twig:63-64,81",
+        mage: "The listing config is sent to the browser as x-magento-init JSON." },
+      { f: "TW", t: "B", phase: "first page load", act: "HTML page with grid metadata + first page",
+        what: "The browser's JS page component reads the JSON and draws the grid. No extra request is needed for the first page.",
+        ref: "View source → search data-page-component-options",
+        mage: "Knockout renders the listing from its config." },
+      { f: "B", t: "GC", phase: "sort / filter (XHR)", act: "XHR GET /admin/datagrid/brand-grid?…",
+        what: "The user sorts or filters. The JS grid calls the generic datagrid route with the grid name and parameters like brand-grid[_sort_by].",
+        ref: "route oro_datagrid_index",
+        mage: "XHR to mui/index/render with the namespace and params." },
+      { f: "GC", t: "DGM", phase: "sort / filter (XHR)", act: "getAction(gridName)",
+        what: "One controller serves every grid in the admin.",
+        ref: "GridController.php:65",
+        mage: "Magento\\Ui\\Controller\\Adminhtml\\Index\\Render serves every listing." },
+      { f: "DGM", t: "DS", phase: "sort / filter (XHR)", act: "Same pipeline, new parameters",
+        what: "Same config, same datasource. Only the request parameters changed.",
+        ref: "", mage: "The same DataProvider with new filters." },
+      { f: "DGM", t: "B", phase: "sort / filter (XHR)", act: "JSON (data + options)",
+        what: "The JS grid re-renders the rows from the JSON response.",
+        ref: "DevTools → Network → datagrid/brand-grid?…",
+        mage: "JSON back to the listing provider. Knockout re-renders." }
+    ],
+    cmds: [
+      "docker compose exec php symfony console debug:router oro_datagrid_index",
+      "docker compose exec php symfony console debug:router | grep brand"
+    ],
+    note: "No CLI command in 5.1.8 dumps a grid's merged config. Use DevTools: view source on /admin/brand/ and search for data-page-component-options."
+  },
+
+  d3: {
+    tab: "Extended field", code: "D3",
+    key: "Core entities are open for extension through migrations + entity config, not by subclassing or editing them. In 5.1 there are no generated proxy classes for extend fields: ExtendEntityTrait resolves get*/set* against metadata.",
+    analogy: "Like an EAV attribute added with a Data Patch. But Oro adds a real column to oro_product (no EAV value tables), and the field config lives in oro_entity_config_field.",
+    lanes: [
+      { id: "M", name: "Your migration", code: "src/Acme/…/Migrations/Schema/v1_x" },
+      { id: "L", name: "oro:migration:load", code: "SQL + oro_migrations" },
+      { id: "EC", name: "Entity config", code: "oro_entity_config_field" },
+      { id: "XC", name: "Extend cache", code: "var/cache/prod/oro_entities/" },
+      { id: "P", name: "Product (vendor, untouched)", code: "ExtendEntityInterface" },
+      { id: "TR", name: "ExtendEntityTrait", code: "__call / __get / __set" },
+      { id: "UI", name: "Admin, grids, import, API", code: "picked up automatically" },
+      { id: "SF", name: "Storefront layout", code: "oro_product_frontend_product_view/*.yml" }
+    ],
+    steps: [
+      { f: "M", t: "M", phase: "write", act: "addColumn('pickupAvailable', 'boolean', oro_options)",
+        what: "$schema->getTable('oro_product')->addColumn(…, ['oro_options' => ['extend' => […]]]). The oro_options array carries the entity-config values.",
+        ref: "pattern: PromotionBundle/…/v1_5/AddDisablePromotionsField.php:17-27",
+        mage: "A Data Patch calling EavSetup::addAttribute('catalog_product', 'pickup_available', […])." },
+      { f: "M", t: "L", phase: "deploy", act: "Run oro:migration:load",
+        what: "Finds migrations that haven't run yet, across all bundles, ordered by bundle and version.",
+        ref: "docker compose exec php symfony console oro:migration:load --dry-run",
+        mage: "bin/magento setup:upgrade." },
+      { f: "L", t: "L", phase: "deploy", act: "ALTER TABLE oro_product ADD pickupavailable",
+        what: "A real column is added, and a row is written to oro_migrations so the migration never runs twice.",
+        ref: "oro_migrations (bundle, version)",
+        mage: "No column: a row in eav_attribute, values later in catalog_product_entity_int. The patch is recorded in patch_list.",
+        diff: "Real column on the entity table. No EAV value tables and no joins to read it." },
+      { f: "L", t: "EC", phase: "deploy", act: "Entity config updated",
+        what: "oro_entity_config_field gets the field with scopes such as extend (owner = Custom/System, is_extend = true), form, view, datagrid, dataaudit.",
+        ref: "oro_entity_config_field",
+        mage: "eav_attribute + catalog_eav_attribute flags (is_visible, used_in_product_listing…)." },
+      { f: "EC", t: "XC", phase: "deploy", act: "Extend cache rebuilt",
+        what: "A small class/alias map is written, and Doctrine metadata gets the extra field.",
+        ref: "var/cache/prod/oro_entities/Extend/Entity/{classes,aliases}.php",
+        mage: "Rough equivalent: generated/ + cache flush after setup:upgrade." },
+      { f: "P", t: "TR", phase: "runtime", act: "Product uses ExtendEntityTrait",
+        what: "The vendor Product class implements ExtendEntityInterface and uses the trait. You never edit it.",
+        ref: "commerce/ProductBundle/Entity/Product.php:173-182",
+        mage: "Product extends AbstractModel → DataObject with magic getters." },
+      { f: "XC", t: "TR", phase: "runtime", act: "$product->getPickupAvailable()",
+        what: "No real method exists. ExtendEntityTrait::__call checks the metadata and reads the field.",
+        ref: "ExtendEntityTrait.php:139  (__get :84, __set :101)",
+        mage: "DataObject::__call turns getPickupAvailable() into getData('pickup_available').",
+        diff: "Magento's magic getter works for any key. Oro's only works for fields that exist in the extend metadata." },
+      { f: "TR", t: "UI", phase: "UI", act: "Appears with no form code",
+        what: "Admin product form and view page, grids (if configured), import/export and API (if enabled) all read entity config.",
+        ref: "entity config scopes: form, view, datagrid, importexport, api",
+        mage: "Assign the attribute to an attribute set; the product form modifier shows it." },
+      { f: "TR", t: "SF", phase: "UI", act: "Add a storefront layout update",
+        what: "Your own YAML in layouts/default/oro_product_frontend_product_view/ is merged with ProductBundle's updates, as in D1.",
+        ref: "src/Acme/…/Resources/views/layouts/default/oro_product_frontend_product_view/*.yml",
+        mage: "catalog_product_view.xml in your module." }
+    ],
+    cmds: [
+      "docker compose exec php symfony console oro:migration:load --dry-run --show-queries",
+      "docker compose exec -T pgsql psql -U oro_db_user -d oro_db -c \"select bundle, version from oro_migrations order by loaded_at desc limit 5\""
+    ],
+    watch: "<b>Upgrade watch:</b> extend-entity internals are a likely place for 5.1 → 7.0 changes. Check UPGRADE.md for ExtendEntityTrait / extend changes in Phase 0C."
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NS = "http://www.w3.org/2000/svg";
+
+let cur = "d1", idx = 0, timer = null, anim = null;
+
+function buildTabs() {
+  $("tabs").innerHTML = Object.entries(DIAGRAMS).map(([k, d]) =>
+    `<button class="tab" role="tab" id="tab-${k}" aria-selected="${k === cur}" data-k="${k}"><span class="mono">${d.code}</span>${esc(d.tab)}</button>`
+  ).join("");
+  $("tabs").querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => select(b.dataset.k, true)));
+}
+
+function select(k, pushHash) {
+  if (!DIAGRAMS[k]) k = "d1";
+  stop();
+  cur = k; idx = 0;
+  const d = DIAGRAMS[k];
+  document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", b.dataset.k === k));
+  $("keyidea").textContent = d.key;
+  $("analogy").textContent = d.analogy;
+  $("lanes").innerHTML = d.lanes.map((l) =>
+    `<div class="lane" data-id="${l.id}"><b>${esc(l.name)}</b><span>${esc(l.code)}</span></div>`).join("");
+
+  const groups = [];
+  d.steps.forEach((s, i) => {
+    if (!groups.length || groups[groups.length - 1].phase !== s.phase) groups.push({ phase: s.phase, items: [] });
+    groups[groups.length - 1].items.push(i);
+  });
+  $("log").innerHTML = groups.map((g) =>
+    `<section><h3>${esc(g.phase)}</h3><ol>${g.items.map((i) =>
+      `<li><button data-i="${i}"><span class="n">${String(i + 1).padStart(2, "0")}</span><span>${esc(d.steps[i].act)}</span></button></li>`).join("")}</ol></section>`
+  ).join("");
+  $("log").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => { stop(); go(+b.dataset.i); }));
+
+  $("cmds").innerHTML = d.cmds.map((c, i) =>
+    `<div class="cmd"><code id="cmd-${k}-${i}">${esc(c)}</code><button class="btn" data-c="${i}">Copy</button></div>`).join("")
+    + (d.note ? `<p class="hint">${esc(d.note)}</p>` : "");
+  $("cmds").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => copy(b, d.cmds[+b.dataset.c])));
+
+  if (d.watch) { $("watch").innerHTML = d.watch; $("watch").hidden = false; } else { $("watch").hidden = true; }
+  if (pushHash) { try { history.replaceState(null, "", "#" + k); } catch (e) {} }
+  go(0);
+}
+
+function copy(btn, text) {
+  const done = () => { btn.textContent = "Copied"; setTimeout(() => (btn.textContent = "Copy"), 1400); };
+  try {
+    navigator.clipboard.writeText(text).then(done, () => selectText(btn));
+  } catch (e) { selectText(btn); }
+}
+function selectText(btn) {
+  const code = btn.previousElementSibling;
+  const r = document.createRange(); r.selectNodeContents(code);
+  const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  btn.textContent = "Press Ctrl+C";
+}
+
+function go(n) {
+  const d = DIAGRAMS[cur];
+  idx = Math.max(0, Math.min(d.steps.length - 1, n));
+  const s = d.steps[idx];
+  const lane = (id) => d.lanes.find((l) => l.id === id);
+
+  $("d-num").textContent = String(idx + 1).padStart(2, "0");
+  $("d-phase").textContent = s.phase;
+  $("d-route").innerHTML = s.f === s.t
+    ? `inside <b>${esc(lane(s.f).name)}</b>`
+    : `<b>${esc(lane(s.f).name)}</b> → <b>${esc(lane(s.t).name)}</b>`;
+  $("d-act").textContent = s.act;
+  $("d-what").textContent = s.what;
+  $("d-refbox").hidden = !s.ref;
+  $("d-ref").textContent = s.ref || "";
+  $("d-mage").textContent = s.mage;
+  $("d-diffbox").hidden = !s.diff;
+  $("d-diff").textContent = s.diff || "";
+
+  const seen = new Set();
+  d.steps.slice(0, idx + 1).forEach((x) => { seen.add(x.f); seen.add(x.t); });
+  document.querySelectorAll(".lane").forEach((el) => {
+    const id = el.dataset.id;
+    el.classList.toggle("seen", seen.has(id));
+    el.classList.toggle("to", id === s.t);
+    el.classList.toggle("from", id === s.f && s.f !== s.t);
+  });
+
+  $("log").querySelectorAll("button").forEach((b) => {
+    const i = +b.dataset.i;
+    b.classList.toggle("current", i === idx);
+    b.classList.toggle("done", i < idx);
+    if (i === idx) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+  });
+  $("counter").textContent = `Step ${idx + 1} / ${d.steps.length}`;
+  $("bar").style.width = ((idx + 1) / d.steps.length * 100) + "%";
+  $("prev").disabled = idx === 0;
+  draw(true);
+}
+
+function laneY(id) {
+  const el = document.querySelector(`.lane[data-id="${id}"]`);
+  return el.offsetTop + el.offsetHeight / 2;
+}
+
+function draw(animate) {
+  const svg = $("wire");
+  const d = DIAGRAMS[cur], s = d.steps[idx];
+  if (anim) cancelAnimationFrame(anim);
+  const h = $("stage").clientHeight;
+  svg.setAttribute("viewBox", `0 0 46 ${h}`);
+  svg.innerHTML = "";
+  const x = 24;
+  const first = laneY(d.lanes[0].id), last = laneY(d.lanes[d.lanes.length - 1].id);
+  const spine = document.createElementNS(NS, "line");
+  spine.setAttribute("x1", x); spine.setAttribute("x2", x); spine.setAttribute("y1", first); spine.setAttribute("y2", last);
+  spine.setAttribute("class", "wire-back");
+  svg.appendChild(spine);
+  d.lanes.forEach((l) => {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", x); c.setAttribute("cy", laneY(l.id)); c.setAttribute("r", 3.5);
+    c.setAttribute("fill", "var(--line)");
+    svg.appendChild(c);
+  });
+
+  const y1 = laneY(s.f), y2 = laneY(s.t);
+  const path = document.createElementNS(NS, "path");
+  let dAttr, endAngle;
+  if (s.f === s.t) {
+    dAttr = `M ${x} ${y1 - 7} C ${x + 22} ${y1 - 22}, ${x + 22} ${y1 + 22}, ${x + 4} ${y1 + 8}`;
+  } else {
+    const bend = 18;
+    dAttr = `M ${x} ${y1} C ${x - bend} ${y1 + (y2 - y1) * 0.3}, ${x - bend} ${y1 + (y2 - y1) * 0.7}, ${x} ${y2}`;
+  }
+  path.setAttribute("d", dAttr);
+  path.setAttribute("class", "wire");
+  svg.appendChild(path);
+  const len = path.getTotalLength();
+  const head = document.createElementNS(NS, "path");
+  head.setAttribute("class", "arrowhead");
+  head.setAttribute("d", "M 0 0 L -8 -4.5 L -8 4.5 Z");
+  const dot = document.createElementNS(NS, "circle");
+  dot.setAttribute("r", 5); dot.setAttribute("class", "dot");
+  svg.appendChild(head); svg.appendChild(dot);
+
+  const place = (t) => {
+    const p = path.getPointAtLength(len * t);
+    const q = path.getPointAtLength(Math.max(0, len * t - 1));
+    const a = Math.atan2(p.y - q.y, p.x - q.x) * 180 / Math.PI;
+    path.style.strokeDasharray = `${len}`;
+    path.style.strokeDashoffset = `${len * (1 - t)}`;
+    head.setAttribute("transform", `translate(${p.x} ${p.y}) rotate(${a})`);
+    dot.setAttribute("cx", p.x); dot.setAttribute("cy", p.y);
+    dot.style.opacity = t < 1 ? 1 : 0;
+  };
+  if (!animate || reduceMotion) { place(1); return; }
+  const dur = 650, t0 = performance.now();
+  const tick = (now) => {
+    const t = Math.min(1, (now - t0) / dur);
+    place(1 - Math.pow(1 - t, 3));
+    if (t < 1) anim = requestAnimationFrame(tick);
+  };
+  anim = requestAnimationFrame(tick);
+}
+
+function play() {
+  const d = DIAGRAMS[cur];
+  if (idx >= d.steps.length - 1) go(0);
+  $("play").textContent = "❚❚ Pause";
+  timer = setInterval(() => {
+    if (idx >= DIAGRAMS[cur].steps.length - 1) { stop(); return; }
+    go(idx + 1);
+  }, 2600);
+}
+function stop() {
+  if (timer) clearInterval(timer);
+  timer = null;
+  $("play").textContent = "▶ Play";
+}
+
+$("prev").addEventListener("click", () => { stop(); go(idx - 1); });
+$("next").addEventListener("click", () => { stop(); go(idx + 1); });
+$("play").addEventListener("click", () => (timer ? stop() : play()));
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("input, textarea")) return;
+  if (e.key === "ArrowRight") { stop(); go(idx + 1); }
+  else if (e.key === "ArrowLeft") { stop(); go(idx - 1); }
+  else if (e.key === " " && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); timer ? stop() : play(); }
+});
+window.addEventListener("resize", () => draw(false));
+window.addEventListener("hashchange", () => select(location.hash.slice(1), false));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => draw(false));
+
+buildTabs();
+select(location.hash.slice(1) || "d1", false);
+</script>

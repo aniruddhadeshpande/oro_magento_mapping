@@ -39,6 +39,7 @@ Learn OroCommerce as a Magento 2 developer, by doing a **real upgrade**: install
 | `notes/qa-log.md` | Q&A history (every question asked + answer) |
 | `notes/oro-folder-structure.md` | Oro folders ↔ Magento folders, "where is X?" table |
 | `notes/trace-request-flow.md` | Mermaid diagrams D1 storefront render, D2 admin datagrid, D3 extend field |
+| `notes/oro-request-flow.html` | Interactive step-through of D1–D3 (also published as a private claude.ai artifact) |
 | `notes/magento-to-oro.md` | Comparison guide (still empty, filled by `/oro-notes`) |
 | `specs/0B-store-locator.md` | Module 0B spec, milestones M1–M6 |
 | `HANDOFF.md` | This file |
