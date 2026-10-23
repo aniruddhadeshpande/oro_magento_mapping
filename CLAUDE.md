@@ -26,7 +26,7 @@
 4. I run a small experiment.
 5. Record in `notes/magento-to-oro.md` (use `/oro-notes`).
 6. Quiz me against the spec's acceptance criteria (use `/oro-quiz`).
-- Log each question I ask (with a short answer) in `notes/qa-log.md`, except when I say not to. The folder map is in `notes/oro-folder-structure.md`.
+- Log each Oro-related question I ask (with a short answer) in `notes/qa-log.md`, except when I say not to. Skip questions about Claude, tooling or git. The folder map is in `notes/oro-folder-structure.md`.
 
 ## Modules (4-week plan)
 0 Install ✅ (5.1.8, Docker, sample data) → 0B Build a feature on 5.1.8 → 0C Upgrade 5.1.8 → 7.0.4
