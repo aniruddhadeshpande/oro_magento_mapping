@@ -1,0 +1,1075 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>OroCloud for ACC Architects</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ops-handbook — one narrow reading column, sticky tab rail, Oro (teal) vs ACC (crimson) colour-coded everywhere */
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --surface-2:#e7edef; --ink:#15212a; --muted:#55636e; --line:#d0d9dd;
+  --oro:#0c6a6f; --oro-soft:#d8eded; --acc:#a92c3b; --acc-soft:#f5e0e2;
+  --unc:#8a5b00; --unc-soft:#f7ebcf; --code:#eaf0f1; --good:#2b7740;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151a; --surface:#162028; --surface-2:#1e2a33; --ink:#e2e9ee; --muted:#9aa9b4; --line:#2b3a45;
+  --oro:#56c3c7; --oro-soft:#12383b; --acc:#f08591; --acc-soft:#3d1c22;
+  --unc:#e6b64f; --unc-soft:#382c10; --code:#111b22; --good:#6cc283; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f151a; --surface:#162028; --surface-2:#1e2a33; --ink:#e2e9ee; --muted:#9aa9b4; --line:#2b3a45;
+  --oro:#56c3c7; --oro-soft:#12383b; --acc:#f08591; --acc-soft:#3d1c22;
+  --unc:#e6b64f; --unc-soft:#382c10; --code:#111b22; --good:#6cc283; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.55;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--oro)}
+:focus-visible{outline:2px solid var(--oro);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(1.7rem,4.5vw,2.4rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0;max-width:68ch}
+code,pre,.mono{font-family:var(--f-mono);font-size:.84em}
+:not(pre)>code{background:var(--surface-2);padding:.08em .35em;border-radius:4px;overflow-wrap:anywhere}
+
+header.top{background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{padding-block:22px 18px;display:grid;gap:8px}
+.eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:70ch}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted);align-items:center}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.tabs .wrap::-webkit-scrollbar{display:none}
+[role=tab]{flex:0 0 auto;font:600 .9rem/1 var(--f-display);letter-spacing:.01em;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:14px 12px 11px;cursor:pointer;white-space:nowrap}
+[role=tab] .n{font-family:var(--f-mono);font-weight:400;font-size:.72rem;margin-right:5px;opacity:.75}
+[role=tab][aria-selected=true]{color:var(--ink);border-bottom-color:var(--oro)}
+[role=tab]:hover{color:var(--ink)}
+
+main .wrap{padding-block:26px 56px}
+.panel{display:grid;gap:30px}
+.panel>section{display:grid;gap:14px;min-width:0}
+.intro{display:grid;gap:10px}
+.intro .big{font-family:var(--f-display);font-size:clamp(1.25rem,3.4vw,1.55rem);font-weight:600;line-height:1.25;max-width:40ch}
+
+.tag{display:inline-block;font:500 .68rem/1 var(--f-mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 6px 3px;border-radius:4px;vertical-align:.12em;white-space:nowrap}
+.tag.oro{background:var(--oro-soft);color:var(--oro)}
+.tag.acc{background:var(--acc-soft);color:var(--acc)}
+.tag.unc{background:var(--unc-soft);color:var(--unc)}
+.tag.ok{background:var(--oro-soft);color:var(--good)}
+.oro-t{color:var(--oro);font-weight:600}.acc-t{color:var(--acc);font-weight:600}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:.88rem}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+thead th{font:600 .76rem/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface-2)}
+th.c-acc{color:var(--acc)} th.c-oro{color:var(--oro)}
+td:first-child{font-weight:500}
+td code{font-size:.8rem}
+table.narrow{min-width:480px}
+
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.spec div{background:var(--surface);padding:10px 12px;display:grid;gap:2px}
+.spec dt{font:500 .72rem/1.2 var(--f-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.spec dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
+
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+ol.steps li::before{content:counter(s);font:600 .78rem/26px var(--f-mono);text-align:center;width:26px;height:26px;border-radius:50%;background:var(--oro);color:var(--surface)}
+ol.steps li>div{min-width:0}
+ul.plain{margin:0;padding-left:1.1em;display:grid;gap:6px;max-width:72ch}
+
+.diagram{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.diagram svg{display:block;width:100%;min-width:640px;height:auto}
+.swipe{font-size:.8rem;color:var(--muted);display:none}
+@media (max-width:680px){.swipe{display:block}}
+svg .box{fill:var(--surface-2);stroke:var(--line);stroke-width:1.2}
+svg .edge-box{fill:var(--oro-soft);stroke:var(--oro);stroke-width:1}
+svg .ops{fill:none;stroke:var(--muted);stroke-dasharray:5 4;stroke-width:1}
+svg .t{fill:var(--ink);font:600 13px var(--f-display)}
+svg .s{fill:var(--muted);font:400 11px var(--f-body)}
+svg .m{fill:var(--muted);font:400 10.5px var(--f-mono)}
+svg .w{fill:var(--unc);font:500 11px var(--f-body)}
+svg .ln{stroke:var(--ink);stroke-width:1.4;fill:none}
+svg .as{stroke:var(--muted);stroke-width:1.3;fill:none;stroke-dasharray:4 3}
+svg .bd circle{fill:var(--oro)} svg .bd text{fill:var(--surface);font:600 10.5px var(--f-mono);text-anchor:middle}
+svg .ah{fill:var(--ink)} svg .ah2{fill:var(--muted)}
+svg [data-k]{cursor:pointer}
+svg [data-k]:hover .box,svg [data-k]:hover .edge-box{stroke:var(--oro);stroke-width:2}
+svg [data-k].on .box,svg [data-k].on .edge-box{stroke:var(--oro);stroke-width:2.4}
+svg [data-k]:focus{outline:none}
+svg [data-k]:focus-visible .box{stroke:var(--oro);stroke-width:2.4}
+svg tspan.lk{fill:var(--oro);text-decoration:underline}
+
+.detail{border:1px solid var(--line);border-left:4px solid var(--oro);border-radius:8px;background:var(--surface);padding:14px 16px;display:grid;gap:10px}
+.detail .row{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.detail .row>span:first-child{font:500 .74rem/1.6 var(--f-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+@media (max-width:520px){.detail .row{grid-template-columns:1fr;gap:2px}}
+.detail .row.fail>span:last-child{color:var(--ink)}
+
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.vs{grid-template-columns:1fr}}
+.col{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px 16px;display:grid;gap:10px;align-content:start;min-width:0}
+.col.oro{border-top:3px solid var(--oro)} .col.acc{border-top:3px solid var(--acc)}
+.col h3{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.col ol{margin:0;padding-left:1.25em;display:grid;gap:5px;font-size:.92rem}
+.pc{display:grid;gap:4px;font-size:.9rem}
+.pc b{font:600 .74rem/1.4 var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.pc .p{color:var(--good)} .pc .c{color:var(--acc)}
+
+.cmd{position:relative;background:var(--code);border:1px solid var(--line);border-radius:7px;min-width:0}
+.cmd pre{margin:0;padding:11px 74px 11px 12px;overflow-x:auto;line-height:1.55}
+.cmd code{font-size:.8rem;white-space:pre}
+.copy{position:absolute;top:6px;right:6px;font:500 .72rem/1 var(--f-mono);padding:7px 9px;border-radius:5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.copy:hover{border-color:var(--oro);color:var(--oro)}
+
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){.modes{grid-template-columns:1fr}}
+.mode{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px;display:grid;gap:8px;align-content:start;min-width:0}
+.mode .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.mode code.big{font-size:.86rem;font-weight:500;background:none;padding:0;color:var(--oro)}
+.mode ol{margin:0;padding-left:1.2em;font-size:.86rem;display:grid;gap:2px}
+.mode .safe{font-size:.86rem;color:var(--muted)}
+
+.picker{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:16px;display:grid;gap:14px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}
+legend{font-weight:600;margin-bottom:6px;padding:0}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:7px;padding:8px 11px;font-size:.88rem;cursor:pointer;background:var(--bg)}
+.opts input{accent-color:var(--oro);margin:0}
+.opts label:has(input:checked){border-color:var(--oro);background:var(--oro-soft)}
+.verdict{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:14px}
+.verdict .v{font-family:var(--f-display);font-size:1.15rem;font-weight:600}
+
+.bars{display:grid;gap:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:14px 16px}
+.bar{display:grid;grid-template-columns:minmax(150px,210px) 1fr;gap:10px;align-items:center}
+@media (max-width:520px){.bar{grid-template-columns:1fr;gap:4px}}
+.bar code{font-size:.78rem;background:none;padding:0}
+.track{position:relative;height:22px;background:var(--surface-2);border-radius:4px}
+.seg{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.seg.tot{background:var(--oro-soft);border:1px solid var(--oro)}
+.seg.mm{background:var(--acc);opacity:.85}
+.track span{position:absolute;top:50%;transform:translateY(-50%);font:500 .74rem/1 var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+
+.layers{display:grid;gap:6px;max-width:620px}
+.layers div{border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:var(--surface);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.88rem}
+.layers div:nth-child(2){margin-left:18px}.layers div:nth-child(3){margin-left:36px;border-color:var(--oro)}
+.layers small{color:var(--muted)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{font:500 .8rem/1 var(--f-body);padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+#cmd-q{flex:1 1 200px;min-width:0;font:inherit;font-size:.9rem;padding:8px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.cards{display:grid;gap:12px}
+.cc{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:14px;display:grid;gap:10px;min-width:0}
+.cc .hd{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.cc .hd h3{font-size:1.02rem}
+.cc .grp{font:500 .7rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cc .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:720px){.cc .pair{grid-template-columns:1fr}}
+.cc .side{display:grid;gap:5px;min-width:0}
+.cc .lab{font:600 .72rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
+.cc .lab.o{color:var(--oro)}.cc .lab.a{color:var(--acc)}
+.cc .note{font-size:.84rem;color:var(--muted)}
+.cc .when{font-size:.88rem;border-top:1px dashed var(--line);padding-top:8px}
+.cc .when b{font-weight:600}
+.empty{color:var(--muted);font-size:.9rem}
+
+.takeaways{border-radius:10px;background:var(--oro-soft);padding:16px 18px;display:grid;gap:10px}
+.takeaways h3{color:var(--oro)}
+.takeaways ul{margin:0;padding-left:1.1em;display:grid;gap:5px}
+.quiz{display:grid;gap:8px}
+.quiz details{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.quiz summary{cursor:pointer;padding:11px 14px;font-weight:500;list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline}
+.quiz summary::-webkit-details-marker{display:none}
+.quiz summary .q{font:600 .76rem/1 var(--f-mono);color:var(--oro)}
+.quiz summary .r{font:500 .72rem/1 var(--f-mono);color:var(--muted)}
+.quiz details[open] summary .r{visibility:hidden}
+.quiz .a{padding:0 14px 12px 40px;color:var(--ink);font-size:.92rem}
+.quiz .a::before{content:"Answer · ";font:600 .74rem var(--f-mono);color:var(--good);text-transform:uppercase}
+.qbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.qbar button{font:500 .78rem/1 var(--f-mono);background:none;border:1px solid var(--line);border-radius:6px;padding:7px 10px;color:var(--ink);cursor:pointer}
+
+.src{font-size:.82rem;color:var(--muted);display:grid;gap:6px}
+.src ul{margin:0;padding-left:1.1em;display:grid;gap:3px}
+.src a{overflow-wrap:anywhere}
+.next{display:flex;justify-content:flex-end}
+.next a{font:600 .92rem var(--f-display);text-decoration:none;border:1px solid var(--oro);padding:10px 14px;border-radius:8px}
+.next a:hover{background:var(--oro-soft)}
+.callout{border:1px solid var(--line);border-left:4px solid var(--unc);background:var(--surface);border-radius:8px;padding:12px 14px;font-size:.9rem;display:grid;gap:6px}
+.callout ul{margin:0;padding-left:1.1em;display:grid;gap:4px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">Study guide · Oro 7.0 LTS · Nov 2026</div>
+    <h1>OroCloud for Adobe Commerce Cloud architects</h1>
+    <p class="lede">Learn OroCloud by mapping it to what you already run on ACC. Each tab ends with key takeaways and a quick self-test.</p>
+    <div class="key"><span><span class="tag oro">Oro</span> OroCloud / OroCommerce</span><span><span class="tag acc">ACC</span> Adobe Commerce Cloud</span><span><span class="tag unc">unconfirmed</span> not verified in official docs</span></div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-tab="overview" aria-selected="true"><span class="n">00</span>Start here</button>
+    <button role="tab" data-tab="architecture" aria-selected="false"><span class="n">01</span>Architecture</button>
+    <button role="tab" data-tab="mapping" aria-selected="false"><span class="n">02</span>Oro vs ACC</button>
+    <button role="tab" data-tab="clouds" aria-selected="false"><span class="n">03</span>OCI vs GCP</button>
+    <button role="tab" data-tab="deploy" aria-selected="false"><span class="n">04</span>Deployment</button>
+    <button role="tab" data-tab="commands" aria-selected="false"><span class="n">05</span>Commands</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<!-- ============ 00 START ============ -->
+<div class="panel" id="p-overview" role="tabpanel">
+  <section class="intro">
+    <p class="big">OroCloud is ACC Pro without git-push deploys.</p>
+    <p>Oro runs a single-tenant, Puppet-managed stack on Google Cloud or Oracle Cloud. You start every release yourself with <code>orocloud-cli</code> on a maintenance node you reach over VPN. Your customisation lives in one file, <code>orocloud.yaml</code>. Oro owns the topology: node counts, service versions and the queue layout change through support requests.</p>
+  </section>
+
+  <section>
+    <h2>Translate your ACC reflexes</h2>
+    <div class="tbl"><table>
+      <thead><tr><th class="c-acc">On ACC you…</th><th class="c-oro">On OroCloud you…</th></tr></thead>
+      <tbody>
+        <tr><td><code>git push</code> to deploy</td><td>SSH to the maintenance node and run <code>orocloud-cli upgrade</code> or <code>app:package:deploy</code></td></tr>
+        <tr><td>Edit <code>.magento.app.yaml</code></td><td>Edit <code>orocloud.yaml</code> (hooks, cron, env vars, nginx and WAF rules)</td></tr>
+        <tr><td>Set values in <code>env.php</code> or <code>magento-cloud variable:set</code></td><td>Set <code>ORO_*</code> variables in <code>application.env_vars</code> or <code>.env-app*</code></td></tr>
+        <tr><td>Edit <code>.magento/services.yaml</code></td><td>Open a support request</td></tr>
+        <tr><td><code>magento-cloud ssh</code></td><td>Connect VPN (OpenVPN + MFA) → bridge host → SSH</td></tr>
+        <tr><td>Rely on Fastly full-page cache and WAF</td><td>Cloudflare or Google CDN, the nginx OroCloud WAF, and layout render cache in Redis</td></tr>
+        <tr><td><code>bin/magento indexer:reindex</code></td><td><code>oro:search:reindex</code> (back office) and <code>oro:website-search:reindex</code> (storefront)</td></tr>
+        <tr><td>Run on MariaDB</td><td>Run on PostgreSQL only</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Stack at a glance (Oro 7.0 LTS, Enterprise)</h2>
+    <dl class="spec">
+      <div><dt>LTS support</dt><dd>Mar 2026 → Mar 2030</dd></div>
+      <div><dt>Database</dt><dd>PostgreSQL ≥ 18.3 (only option since 5.1)</dd></div>
+      <div><dt>Search</dt><dd>Elasticsearch ≥ 9.2, &lt; 10</dd></div>
+      <div><dt>Message queue</dt><dd>RabbitMQ ≥ 4.2</dd></div>
+      <div><dt>Cache / sessions</dt><dd>Redis ≥ 8.4 + Sentinel</dd></div>
+      <div><dt>Runtime</dt><dd>PHP ≥ 8.5 · Node ≥ 24.11</dd></div>
+      <div><dt>File storage</dt><dd>GridFS (media, attachments)</dd></div>
+      <div><dt>Hosting</dt><dd>GCP or OCI, single tenant</dd></div>
+    </dl>
+    <p style="font-size:.86rem;color:var(--muted)">OpenSearch is not in Oro's official requirements, so treat it as unsupported <span class="tag unc">unconfirmed</span>.</p>
+  </section>
+
+  <section>
+    <h2>Five things that surprise ACC people</h2>
+    <div class="callout"><ul>
+      <li>Backups cover the database, code and media, but <b>not Elasticsearch or RabbitMQ</b>. Plan a reindex after every restore.</li>
+      <li>Every upgrade <b>removes patches</b> applied with <code>orocloud-cli patch:apply</code>.</li>
+      <li>Zero downtime is a per-release choice. <code>upgrade:rolling</code> is only safe when the schema change is backward compatible, and that judgement is yours.</li>
+      <li>Only consumers that were running before an upgrade run after it. Check them after each deploy.</li>
+      <li>Oro's docs disagree on the cache command: <code>cache:rebuild</code> (7.0) vs <code>app:cache:clear</code> (7.1 dev). Run <code>orocloud-cli list</code> on your node.</li>
+    </ul></div>
+  </section>
+
+  <section>
+    <h2>Suggested 25-minute path</h2>
+    <ol class="steps">
+      <li><div><b>Architecture</b> (6 min). Tap each box in the diagram.</div></li>
+      <li><div><b>Oro vs ACC</b> (6 min). Focus on the config-file table.</div></li>
+      <li><div><b>Deployment</b> (8 min). Try the upgrade-mode picker.</div></li>
+      <li><div><b>Commands</b> (5 min). Filter by the task you do most.</div></li>
+      <li><div><b>OCI vs GCP</b> only if your project's hosting matters to you.</div></li>
+    </ol>
+  </section>
+  <div class="next"><a href="#architecture">Start: Architecture →</a></div>
+</div>
+
+<!-- ============ 01 ARCHITECTURE ============ -->
+<div class="panel" id="p-architecture" role="tabpanel" hidden>
+  <section class="intro">
+    <h2>Architecture overview</h2>
+    <p>A CDN/WAF in front, at least two nginx + PHP-FPM web nodes, separate job nodes for consumers, a PostgreSQL failover pair, Elasticsearch, RabbitMQ, Redis with Sentinel, GridFS and an SMTP relay. Tap any box for its role, scaling model and failure impact.</p>
+  </section>
+
+  <section>
+    <p class="swipe">Swipe sideways to see the whole diagram.</p>
+    <div class="diagram">
+<svg viewBox="0 0 720 676" role="img" aria-labelledby="dg-t" xmlns="http://www.w3.org/2000/svg">
+  <title id="dg-t">OroCloud architecture: CDN, web nodes, data services, async lane and ops plane</title>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah2" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+
+  <!-- legend -->
+  <g transform="translate(520,22)">
+    <text class="t" x="0" y="0">Legend</text>
+    <line class="ln" x1="0" y1="20" x2="34" y2="20" marker-end="url(#ah)"/><text class="s" x="44" y="24">request path</text>
+    <line class="as" x1="0" y1="42" x2="34" y2="42" marker-end="url(#ah2)"/><text class="s" x="44" y="46">async / background</text>
+    <g class="bd"><circle cx="9" cy="64" r="9"/><text x="9" y="68">1</text></g><text class="s" x="44" y="68">step in request flow</text>
+    <text class="w" x="0" y="92">⚠ not in backups</text>
+    <text class="s" x="0" y="114">Tap a box for details</text>
+  </g>
+
+  <!-- client -->
+  <rect class="box" x="140" y="14" width="200" height="40" rx="8"/>
+  <text class="t" x="240" y="39" text-anchor="middle">Browser / API client</text>
+
+  <!-- edges -->
+  <path class="ln" d="M205,54 L130,94" marker-end="url(#ah)"/>
+  <path class="ln" d="M275,54 L350,94" marker-end="url(#ah)"/>
+  <g class="bd"><circle cx="240" cy="76" r="9"/><text x="240" y="80">1</text></g>
+
+  <g data-k="edge" tabindex="0" role="button" aria-label="CDN and load balancer">
+    <rect class="edge-box" x="20" y="96" width="210" height="58" rx="8"/>
+    <text class="t" x="125" y="120" text-anchor="middle">Google CDN + LB</text>
+    <text class="s" x="125" y="139" text-anchor="middle">GCP only · TLS ends at LB</text>
+  </g>
+  <g data-k="edge" tabindex="0" role="button" aria-label="Cloudflare edge">
+    <rect class="edge-box" x="250" y="96" width="210" height="58" rx="8"/>
+    <text class="t" x="355" y="120" text-anchor="middle">Cloudflare edge</text>
+    <text class="s" x="355" y="139" text-anchor="middle">GCP or OCI · TLS ends at edge</text>
+  </g>
+  <text class="t" x="240" y="130" text-anchor="middle" style="font-size:11px;fill:var(--muted)">or</text>
+
+  <path class="ln" d="M125,154 L125,198" marker-end="url(#ah)"/>
+  <path class="ln" d="M355,154 L355,198" marker-end="url(#ah)"/>
+  <text class="m" x="132" y="181">HTTP :80 · WS :8080</text>
+  <text class="m" x="362" y="181">cloudflared tunnel</text>
+  <g class="bd"><circle cx="268" cy="176" r="9"/><text x="268" y="180">2</text></g>
+
+  <!-- web -->
+  <g data-k="web" tabindex="0" role="button" aria-label="Web nodes">
+    <rect class="box" x="20" y="200" width="440" height="100" rx="8"/>
+    <text class="t" x="38" y="224">Web nodes · ≥ 2, across zones</text>
+    <text class="s" x="38" y="268">PHP-FPM · Symfony app (storefront, back office, API)</text>
+    <text class="s" x="38" y="287">WebSocket server :8080</text>
+  </g>
+  <g data-k="waf" tabindex="0" role="button" aria-label="OroCloud WAF">
+    <text class="s" x="38" y="248"><tspan class="lk">nginx + OroCloud WAF</tspan> (Naxsi, rate limits, access_policy)</text>
+  </g>
+  <g class="bd"><circle cx="436" cy="244" r="9"/><text x="436" y="248">3</text></g>
+
+  <!-- web -> data -->
+  <path class="ln" d="M70.5,300 L70.5,338" marker-end="url(#ah)"/>
+  <path class="ln" d="M183.5,300 L183.5,338" marker-end="url(#ah)"/>
+  <path class="ln" d="M296.5,300 L296.5,338" marker-end="url(#ah)"/>
+  <path class="ln" d="M409.5,300 L409.5,338" marker-end="url(#ah)"/>
+  <g class="bd"><circle cx="88" cy="319" r="9"/><text x="88" y="323">4</text></g>
+  <g class="bd"><circle cx="201" cy="319" r="9"/><text x="201" y="323">5</text></g>
+
+  <g data-k="redis" tabindex="0" role="button" aria-label="Redis">
+    <rect class="box" x="20" y="340" width="101" height="72" rx="8"/>
+    <text class="t" x="70.5" y="362" text-anchor="middle">Redis</text>
+    <text class="s" x="70.5" y="380" text-anchor="middle">cache · sessions</text>
+    <text class="s" x="70.5" y="396" text-anchor="middle">+ Sentinel</text>
+  </g>
+  <g data-k="pg" tabindex="0" role="button" aria-label="PostgreSQL">
+    <rect class="box" x="133" y="340" width="101" height="72" rx="8"/>
+    <text class="t" x="183.5" y="362" text-anchor="middle">PostgreSQL</text>
+    <text class="s" x="183.5" y="380" text-anchor="middle">system of record</text>
+    <text class="s" x="183.5" y="396" text-anchor="middle">primary + failover</text>
+  </g>
+  <g data-k="es" tabindex="0" role="button" aria-label="Elasticsearch">
+    <rect class="box" x="246" y="340" width="101" height="72" rx="8"/>
+    <text class="t" x="296.5" y="362" text-anchor="middle">Elasticsearch</text>
+    <text class="s" x="296.5" y="380" text-anchor="middle">2 indexes</text>
+    <text class="w" x="296.5" y="396" text-anchor="middle">⚠ not backed up</text>
+  </g>
+  <g data-k="gridfs" tabindex="0" role="button" aria-label="GridFS file storage">
+    <rect class="box" x="359" y="340" width="101" height="72" rx="8"/>
+    <text class="t" x="409.5" y="362" text-anchor="middle">GridFS</text>
+    <text class="s" x="409.5" y="380" text-anchor="middle">media · files</text>
+    <text class="s" x="409.5" y="396" text-anchor="middle">attachments</text>
+  </g>
+
+  <!-- consumer bus -->
+  <path class="as" d="M70.5,412 V434 M183.5,412 V434 M296.5,412 V434 M409.5,412 V434"/>
+  <path class="as" d="M70.5,434 H605 V414"/>
+  <text class="s" x="70" y="452">consumers read and write the same DB, search indexes and files</text>
+
+  <!-- right lane -->
+  <g data-k="cron" tabindex="0" role="button" aria-label="Cron">
+    <rect class="box" x="510" y="196" width="190" height="46" rx="8"/>
+    <text class="t" x="605" y="216" text-anchor="middle">Cron · oro:cron</text>
+    <text class="s" x="605" y="233" text-anchor="middle">every minute</text>
+  </g>
+  <path class="as" d="M605,242 L605,266" marker-end="url(#ah2)"/>
+
+  <path class="ln" d="M460,290 L508,290" marker-end="url(#ah)"/>
+  <text class="m" x="463" y="282">publish</text>
+  <g class="bd"><circle cx="484" cy="308" r="9"/><text x="484" y="312">6</text></g>
+
+  <g data-k="mq" tabindex="0" role="button" aria-label="RabbitMQ">
+    <rect class="box" x="510" y="268" width="190" height="50" rx="8"/>
+    <text class="t" x="605" y="289" text-anchor="middle">RabbitMQ cluster</text>
+    <text class="w" x="605" y="307" text-anchor="middle">⚠ not backed up</text>
+  </g>
+  <path class="as" d="M605,318 L605,340" marker-end="url(#ah2)"/>
+  <g class="bd"><circle cx="628" cy="329" r="9"/><text x="628" y="333">7</text></g>
+
+  <g data-k="consumers" tabindex="0" role="button" aria-label="Job nodes and consumers">
+    <rect class="box" x="510" y="342" width="190" height="70" rx="8"/>
+    <text class="t" x="605" y="362" text-anchor="middle">Job nodes</text>
+    <text class="m" x="605" y="380" text-anchor="middle">oro:message-queue:consume</text>
+    <text class="s" x="605" y="398" text-anchor="middle">4 consumers / queue / node</text>
+  </g>
+  <path class="as" d="M672,412 L672,468" marker-end="url(#ah2)"/>
+  <g class="bd"><circle cx="690" cy="440" r="9"/><text x="690" y="444">8</text></g>
+
+  <g data-k="smtp" tabindex="0" role="button" aria-label="SMTP relay">
+    <rect class="box" x="510" y="470" width="190" height="50" rx="8"/>
+    <text class="t" x="605" y="491" text-anchor="middle">SMTP relay</text>
+    <text class="s" x="605" y="508" text-anchor="middle">multi-relay · active-active</text>
+  </g>
+  <text class="s" x="605" y="538" text-anchor="middle">→ recipients (non-prod: allow-listed domains)</text>
+
+  <!-- ops plane -->
+  <rect class="ops" x="20" y="560" width="680" height="100" rx="10"/>
+  <text class="s" x="36" y="580" style="font-weight:600">Ops plane · not in the request path</text>
+  <g data-k="maint" tabindex="0" role="button" aria-label="Maintenance node">
+    <rect class="box" x="36" y="592" width="430" height="54" rx="8"/>
+    <text class="t" x="251" y="614" text-anchor="middle">VPN (OpenVPN + MFA) → bridge → maintenance node</text>
+    <text class="s" x="251" y="633" text-anchor="middle">orocloud-cli runs here: deploys, backups, logs, media</text>
+  </g>
+  <g data-k="nat" tabindex="0" role="button" aria-label="NAT node">
+    <rect class="box" x="482" y="592" width="202" height="54" rx="8"/>
+    <text class="t" x="583" y="614" text-anchor="middle">NAT node</text>
+    <text class="s" x="583" y="633" text-anchor="middle">fixed egress IP</text>
+  </g>
+</svg>
+    </div>
+    <div class="detail" id="detail" aria-live="polite"></div>
+  </section>
+
+  <section>
+    <h2>Request flow, step by step</h2>
+    <ol class="steps">
+      <li><div>DNS points to Cloudflare or the Google LB, where TLS ends.</div></li>
+      <li><div><b>GCP path:</b> the Google LB forwards HTTP :80 and WebSocket :8080 to a web node. <b>Cloudflare path:</b> traffic arrives through the outbound <code>cloudflared</code> tunnel and nginx balances across web nodes. Web nodes have no public IPs.</div></li>
+      <li><div>The nginx OroCloud WAF applies <code>access_policy</code> (IP, ASN, country, user agent, URI; blocked requests get <b>451</b>), bot testcookie and Naxsi checks, then rate limits (429/503).</div></li>
+      <li><div>PHP-FPM boots Symfony and reads the session and caches from Redis. Default DSNs: session <code>/0</code>, cache <code>/1</code>, Doctrine <code>/2</code>, layout <code>/3</code>.</div></li>
+      <li><div>The app reads and writes PostgreSQL. Storefront search and listings query the Elasticsearch website index. Media comes from GridFS.</div></li>
+      <li><div>Heavy work (reindex, price recalculation, imports, emails) is published to RabbitMQ and the response returns immediately.</div></li>
+      <li><div>Consumers on job nodes process the messages. Cron (<code>oro:cron</code>) triggers scheduled commands, many of which also run as messages.</div></li>
+      <li><div>Mail leaves through the SMTP relay. Outbound API calls leave through the NAT node's fixed IP, which is the address partners allow-list.</div></li>
+    </ol>
+  </section>
+
+  <section>
+    <details>
+      <summary style="cursor:pointer;font-weight:600">All components as a table</summary>
+      <div class="tbl" style="margin-top:10px"><table id="comp-table">
+        <thead><tr><th>Component</th><th>Role</th><th>Scaling</th><th>If it fails</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </details>
+  </section>
+
+  <section class="takeaways">
+    <h3>Key takeaways</h3>
+    <ul>
+      <li>Same shape as ACC Pro: edge, HA web tier, async workers, managed data services.</li>
+      <li>Consumers are long-running daemons on dedicated job nodes, not cron-spawned.</li>
+      <li>Two search indexes: back office (<code>oro_search</code>) and storefront (<code>oro_website_search</code>).</li>
+      <li>With Cloudflare there is no public origin IP. The web tier is reachable only through the tunnel.</li>
+      <li>Elasticsearch and RabbitMQ are outside backups.</li>
+    </ul>
+  </section>
+
+  <section class="quiz">
+    <div class="qbar"><h3>Self-test</h3><button type="button" data-reveal>Show all answers</button></div>
+    <details><summary><span class="q">Q1</span>Can a new Oro 7.0 project run on MySQL?<span class="r">tap</span></summary><div class="a">No. PostgreSQL has been the only supported database since 5.1. 7.0 Enterprise needs PostgreSQL ≥ 18.3.</div></details>
+    <details><summary><span class="q">Q2</span>Which search engine does OroCloud run, and is OpenSearch supported?<span class="r">tap</span></summary><div class="a">Elasticsearch (≥ 9.2, &lt; 10 for 7.0 EE). OpenSearch is not in the official requirements, so treat it as unsupported (unconfirmed).</div></details>
+    <details><summary><span class="q">Q3</span>Behind Cloudflare, why can't you hit the origin IP directly?<span class="r">tap</span></summary><div class="a">Web nodes have no public IPs. Traffic only arrives through the outbound <code>cloudflared</code> tunnel.</div></details>
+    <details><summary><span class="q">Q4</span>How many consumers serve each queue on each job server?<span class="r">tap</span></summary><div class="a">Four. Adding a queue adds four consumers per job server.</div></details>
+    <details><summary><span class="q">Q5</span>A user gets HTTP 451 from the storefront. Where do you look first?<span class="r">tap</span></summary><div class="a">The <code>access_policy</code> rules of the OroCloud WAF in <code>orocloud.yaml</code>, and the <code>naxsi-error</code> / nginx logs.</div></details>
+  </section>
+
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://doc.oroinc.com/cloud/architecture/" target="_blank" rel="noopener">OroCloud Architecture</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/architecture/mq/" target="_blank" rel="noopener">OroCloud Message Queue</a></li>
+    <li><a href="https://doc.oroinc.com/backend/setup/system-requirements/" target="_blank" rel="noopener">Oro System Requirements</a></li>
+    <li><a href="https://doc.oroinc.com/5.1/backend/setup/mysql-to-postgresql/" target="_blank" rel="noopener">Oro 5.1: MySQL to PostgreSQL</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/security/" target="_blank" rel="noopener">OroCloud Security / WAF</a></li>
+    <li><a href="https://doc.oroinc.com/backend/cron/" target="_blank" rel="noopener">Oro Cron</a></li>
+    <li><a href="https://doc.oroinc.com/frontend/storefront/render-cache/" target="_blank" rel="noopener">Oro Render Cache</a></li>
+  </ul></div>
+  <div class="next"><a href="#mapping">Next: Oro vs ACC →</a></div>
+</div>
+
+<!-- ============ 02 MAPPING ============ -->
+<div class="panel" id="p-mapping" role="tabpanel" hidden>
+  <section class="intro">
+    <h2>Oro vs ACC, component by component</h2>
+    <p>Most ACC concepts have a direct OroCloud counterpart. The gaps are self-service infrastructure (services, workers, mounts, branch environments) and Fastly's full-page cache.</p>
+  </section>
+
+  <section>
+    <h3>Components</h3>
+    <div class="tbl"><table>
+      <thead><tr><th class="c-acc">ACC (Pro)</th><th class="c-oro">OroCloud</th><th>What to know</th></tr></thead>
+      <tbody>
+        <tr><td>Fastly CDN + Varnish full-page cache</td><td>Cloudflare or Google CDN for edge and static content; layout render cache in Redis</td><td>No documented Oro full-page cache <span class="tag unc">unconfirmed</span>. Tune render cache, Redis and ES instead.</td></tr>
+        <tr><td>Fastly WAF</td><td>Cloudflare protection + nginx OroCloud WAF</td><td>You edit WAF rules yourself in <code>orocloud.yaml</code>.</td></tr>
+        <tr><td>Fastly origin cloaking</td><td>Cloudflare tunnel, or Google LB as the only public IP</td><td>Same intent.</td></tr>
+        <tr><td>RabbitMQ + <code>CRON_CONSUMERS_RUNNER</code> or workers</td><td>RabbitMQ + long-running consumers on job nodes</td><td>Queue and consumer layout is Oro-managed.</td></tr>
+        <tr><td><code>bin/magento cron:run</code></td><td><code>oro:cron</code> every minute; custom jobs in <code>schedule</code></td><td>Same role.</td></tr>
+        <tr><td>OpenSearch</td><td>Elasticsearch: <code>oro_search</code> + <code>oro_website_search</code></td><td>Two reindex commands.</td></tr>
+        <tr><td>Redis / Valkey</td><td>Redis + Sentinel, separate session, cache, Doctrine and layout DSNs</td><td>Sessions in Redis by default, as on ACC.</td></tr>
+        <tr><td>MariaDB (Galera, 3 nodes)</td><td>PostgreSQL primary + secondary zone, auto failover</td><td>Port raw SQL and custom reports.</td></tr>
+        <tr><td>SendGrid</td><td>SMTP relay, <code>ORO_MAILER_DSN</code>, non-prod allow-list</td><td>Domain/SPF setup via onboarding <span class="tag unc">unconfirmed</span>.</td></tr>
+        <tr><td>Mounts (<code>pub/media</code>, <code>var</code>)</td><td>GridFS + <code>orocloud-cli media:*</code> + SFTP</td><td>No writable mounts to rsync.</td></tr>
+        <tr><td>New Relic (included)</td><td>Bring your own New Relic or Blackfire licence; GCP Logs Explorer</td><td>Oro monitors infrastructure internally.</td></tr>
+        <tr><td>Cloud Console + <code>magento-cloud</code></td><td>Support Portal + <code>orocloud-cli</code> on the maintenance node</td><td>No self-service branching or environment cloning.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3>Config files</h3>
+    <div class="tbl"><table>
+      <thead><tr><th class="c-acc">ACC file / setting</th><th class="c-oro">OroCloud equivalent</th></tr></thead>
+      <tbody>
+        <tr><td><code>.magento.app.yaml</code> → <code>hooks</code></td><td><code>orocloud_options.deployment.*_commands</code> (<code>pre_upgrade_commands</code>, <code>post_upgrade_commands</code>, <code>pre/post_maintenance_commands</code>, <code>upgrade_commands</code>, <code>install_commands</code>)</td></tr>
+        <tr><td><code>.magento.app.yaml</code> → <code>crons</code></td><td><code>orocloud_options.schedule</code></td></tr>
+        <tr><td><code>.magento.app.yaml</code> → <code>web.locations</code></td><td><code>orocloud_options.webserver</code> (locations, basic auth, redirects, WAF)</td></tr>
+        <tr><td><code>.magento.app.yaml</code> → <code>workers</code>, <code>mounts</code>, <code>relationships</code></td><td>None. Oro manages them.</td></tr>
+        <tr><td><code>.magento.env.yaml</code></td><td><code>orocloud.yaml</code> deployment section + app env vars. No <code>SCD_*</code> knobs; use pre-built assets or app packages.</td></tr>
+        <tr><td><code>.magento/services.yaml</code></td><td>None. Service versions and sizes change through support.</td></tr>
+        <tr><td><code>.magento/routes.yaml</code></td><td><code>webserver.redirects_map</code> + per-domain <code>domains:</code> blocks. Domains and TLS are set up at onboarding.</td></tr>
+        <tr><td><code>app/etc/env.php</code></td><td><code>.env-app</code>, <code>.env-app.local</code>, <code>.env-app.$ORO_ENV</code>(<code>.local</code>). Real env vars win. <code>parameters.yml</code> is legacy.</td></tr>
+        <tr><td><code>magento-cloud variable:set</code></td><td><code>orocloud_options.application.env_vars</code>. Never set an empty value such as <code>ORO_DB_DSN=</code>.</td></tr>
+        <tr><td>DB / search / cache creds in <code>env.php</code></td><td><code>ORO_DB_DSN</code>, <code>ORO_SEARCH_ENGINE_DSN</code>, <code>ORO_WEBSITE_SEARCH_ENGINE_DSN</code>, <code>ORO_REDIS_*_DSN</code>, <code>ORO_MAILER_DSN</code>, <code>ORO_SECRET</code>. Pre-wired by Oro.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3>How <code>orocloud.yaml</code> layers per environment</h3>
+    <div class="layers">
+      <div><span><code>/mnt/{ocom,ocrm}/app/orocloud.yaml</code></span><small>Oro defaults</small></div>
+      <div><span><code>www/orocloud.yaml</code></span><small>your repo, all envs</small></div>
+      <div><span><code>www/orocloud_{dev,stag,uat,prod}.yaml</code></span><small>per-env override, wins</small></div>
+    </div>
+    <p style="font-size:.9rem">Oro calls this the Environment Type Approach. It is required for app packages. Valid changes apply within 10 minutes or on the next deploy. Validate first with <code>orocloud-cli config:validate</code>.</p>
+    <p style="font-size:.86rem;color:var(--muted)">Illustrative skeleton using documented keys. Exact nesting of <code>schedule</code> and WAF entries <span class="tag unc">unconfirmed</span>; check <code>orocloud-cli config:help &lt;key&gt;</code>.</p>
+    <div class="cmd"><pre><code>orocloud_options:
+  deployment:
+    pre_upgrade_commands:
+      - 'oro:some:command --env=prod'
+    post_upgrade_commands:
+      - 'oro:website-search:reindex --scheduled'
+  schedule:
+    # custom cron entries (replaces .magento.app.yaml crons)
+  application:
+    env_vars:
+      ORO_EXAMPLE_FLAG: 'true'
+  webserver:
+    # locations, redirects_map, access_policy (WAF), basic auth</code></pre><button class="copy" type="button">Copy</button></div>
+  </section>
+
+  <section>
+    <h3>Environments and scaling</h3>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th class="c-acc">ACC</th><th class="c-oro">OroCloud</th></tr></thead>
+      <tbody>
+        <tr><td>Tiers</td><td><b>Starter:</b> up to 4 envs, no HA cluster. <b>Pro:</b> integration + staging + production on a 3-node HA cluster across 3 AZs.</td><td>Env types dev, UAT, staging, prod. Count depends on your licence. Staging should mirror prod.</td></tr>
+        <tr><td>New environment</td><td>Git branch = integration environment</td><td>Support request, 3–5 working days</td></tr>
+        <tr><td>Access</td><td><code>magento-cloud ssh</code></td><td>VPN (OpenVPN + MFA) → bridge → SSH; per-person prod access</td></tr>
+        <tr><td>Scaling</td><td>Adobe-managed; Pro service changes need a ticket</td><td>Oro-managed. Send sizing metrics to support at least 2 weeks before launch.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="takeaways">
+    <h3>Key takeaways</h3>
+    <ul>
+      <li><code>.magento.app.yaml</code> hooks become command lists in <code>orocloud.yaml</code>.</li>
+      <li><code>env.php</code> becomes <code>ORO_*</code> env vars and <code>.env-app*</code> files.</li>
+      <li>Anything in <code>services.yaml</code>, workers or mounts is a support request.</li>
+      <li>You own the WAF rules; Adobe owns most of them on ACC.</li>
+      <li>Per-env overrides live in <code>orocloud_{env}.yaml</code>.</li>
+    </ul>
+  </section>
+
+  <section class="quiz">
+    <div class="qbar"><h3>Self-test</h3><button type="button" data-reveal>Show all answers</button></div>
+    <details><summary><span class="q">Q1</span>What replaces <code>.magento.app.yaml</code> hooks?<span class="r">tap</span></summary><div class="a"><code>orocloud_options.deployment.*_commands</code> in <code>orocloud.yaml</code>.</div></details>
+    <details><summary><span class="q">Q2</span>You need two more consumers on the import queue. What do you do?<span class="r">tap</span></summary><div class="a">Open a support request. Oro changes the queue layout after testing on stage and getting your approval.</div></details>
+    <details><summary><span class="q">Q3</span>What is the self-editable equivalent of Fastly WAF rules?<span class="r">tap</span></summary><div class="a"><code>orocloud_options.webserver.access_policy</code> and the rate-limit allow-lists in <code>orocloud.yaml</code>.</div></details>
+    <details><summary><span class="q">Q4</span>Can you rsync a <code>pub/media</code>-style mount?<span class="r">tap</span></summary><div class="a">No. Media lives in GridFS. Use <code>orocloud-cli media:*</code> or SFTP.</div></details>
+    <details><summary><span class="q">Q5</span>Prod needs a different env var from staging. Where does it go?<span class="r">tap</span></summary><div class="a"><code>orocloud_prod.yaml</code> in the repo root, under <code>application.env_vars</code>.</div></details>
+  </section>
+
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/advanced-use/" target="_blank" rel="noopener">OroCloud Advanced Configuration</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/env-vars/" target="_blank" rel="noopener">OroCloud Environment Variables</a></li>
+    <li><a href="https://doc.oroinc.com/backend/setup/dev-environment/env-vars/" target="_blank" rel="noopener">Oro App Environment Variables</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/dif-environments/" target="_blank" rel="noopener">OroCloud Per-Environment Config</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/environments/" target="_blank" rel="noopener">OroCloud Environments</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/cdn/fastly" target="_blank" rel="noopener">Adobe: Fastly services</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/configure/app/properties/workers-property" target="_blank" rel="noopener">Adobe: workers property</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-cloud-service/user-guide/configure/service/services-yaml" target="_blank" rel="noopener">Adobe: services.yaml</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/architecture/pro-architecture" target="_blank" rel="noopener">Adobe: Pro architecture</a> · <a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/architecture/starter-architecture" target="_blank" rel="noopener">Starter architecture</a></li>
+  </ul></div>
+  <div class="next"><a href="#clouds">Next: OCI vs GCP →</a></div>
+</div>
+
+<!-- ============ 03 CLOUDS ============ -->
+<div class="panel" id="p-clouds" role="tabpanel" hidden>
+  <section class="intro">
+    <h2>OroCloud on OCI vs GCP</h2>
+    <p>For application and deployment work the two behave the same. Oro documents only two practical differences: the edge (Google CDN is GCP-only) and self-service logs (documented for the GCP console only).</p>
+  </section>
+
+  <section>
+    <div class="tbl"><table>
+      <thead><tr><th>Area</th><th>GCP</th><th>OCI</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Supported</td><td>Yes, out of the box</td><td>Yes; Oracle and Cloudflare listed as subprocessors from 1 Jul 2024</td><td><span class="tag ok">official</span></td></tr>
+        <tr><td>Isolation</td><td>Dedicated GCP project</td><td>Dedicated OCI tenancy ("subtenancy" in some pages)</td><td><span class="tag ok">official</span></td></tr>
+        <tr><td>Regions</td><td colspan="2">US, South America, Europe, Asia. You pick the region; each prod region has a cold DR region. No per-provider list published.</td><td><span class="tag ok">official</span></td></tr>
+        <tr><td>CDN / LB</td><td>Google CDN + LB <b>or</b> Cloudflare</td><td>Cloudflare</td><td><span class="tag ok">official</span></td></tr>
+        <tr><td>Logs and monitoring</td><td>Logs Explorer, Error Reporting, Cloud Monitoring</td><td>Not documented</td><td><span class="tag unc">unconfirmed</span></td></tr>
+        <tr><td>Managed services</td><td colspan="2">Same stack, backups, RPO and RTO on both</td><td><span class="tag ok">official</span></td></tr>
+        <tr><td><code>orocloud-cli</code></td><td colspan="2">Same command set; no documented differences</td><td><span class="tag unc">unconfirmed</span></td></tr>
+        <tr><td>Performance and cost</td><td colspan="2">No official comparison</td><td><span class="tag unc">unconfirmed</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h3>How to tell which cloud an environment runs on</h3>
+    <ol class="steps">
+      <li><div><b>Ask Oro Support or check your onboarding pack.</b> Oro sends primary and DR IP addresses at onboarding. Whether it names the provider is <span class="tag unc">unconfirmed</span>.</div></li>
+      <li><div><b>You were given GCP console / Logs Explorer access</b> → GCP. Strong indicator, by inference.</div></li>
+      <li><div><b>Response headers.</b> <code>server: cloudflare</code> or <code>cf-ray</code> means Cloudflare (either cloud). <code>via: 1.1 google</code> means the Google LB, so GCP. <span class="tag unc">unconfirmed heuristic</span></div></li>
+      <li><div><b>ASN of the NAT egress IP</b> (Google vs Oracle). <span class="tag unc">unconfirmed heuristic</span></div></li>
+      <li><div><b>From an SSH session:</b> <code>/sys/class/dmi/id/sys_vendor</code>, or the provider metadata endpoints. May be blocked. <span class="tag unc">unconfirmed</span></div></li>
+    </ol>
+    <div class="cmd"><pre><code># edge: cloudflare vs google LB
+curl -sI https://your-store.example.com | grep -iE '^(server|via|cf-ray):'
+
+# on the node (may be blocked)
+cat /sys/class/dmi/id/sys_vendor</code></pre><button class="copy" type="button">Copy</button></div>
+    <p style="font-size:.86rem;color:var(--muted)">Hostnames such as <code>ocom-&lt;project&gt;-prod1-maint1</code> do not encode the provider.</p>
+  </section>
+
+  <section class="takeaways">
+    <h3>Key takeaways</h3>
+    <ul>
+      <li>OCI means Cloudflare at the edge, with no public origin IP.</li>
+      <li>On OCI, ask support how you get application logs. Only GCP tooling is documented.</li>
+      <li>Deploy commands, backups and topology are the same on both.</li>
+      <li>There is no official CLI flag that shows the IaaS.</li>
+    </ul>
+  </section>
+
+  <section class="quiz">
+    <div class="qbar"><h3>Self-test</h3><button type="button" data-reveal>Show all answers</button></div>
+    <details><summary><span class="q">Q1</span>Can an OCI environment use Google CDN?<span class="r">tap</span></summary><div class="a">No. Google CDN and LB are GCP-only. Cloudflare works on both.</div></details>
+    <details><summary><span class="q">Q2</span>Which platform's logging tools are documented for customers?<span class="r">tap</span></summary><div class="a">GCP: Logs Explorer and Error Reporting. OCI log access is undocumented.</div></details>
+    <details><summary><span class="q">Q3</span>Is there an official way to see the IaaS from the CLI?<span class="r">tap</span></summary><div class="a">No. Ask Oro Support. Header and ASN checks are unconfirmed heuristics.</div></details>
+    <details><summary><span class="q">Q4</span>Do deployment commands differ between OCI and GCP?<span class="r">tap</span></summary><div class="a">No documented differences.</div></details>
+  </section>
+
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://doc.oroinc.com/cloud/architecture/" target="_blank" rel="noopener">OroCloud Architecture</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/monitoring/" target="_blank" rel="noopener">OroCloud Monitoring</a></li>
+    <li><a href="https://doc.oroinc.com/user/solution-architect/cloud-infrastructure/" target="_blank" rel="noopener">Oro Cloud Infrastructure (solution architect)</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/" target="_blank" rel="noopener">OroCloud documentation home</a></li>
+  </ul></div>
+  <div class="next"><a href="#deploy">Next: Deployment →</a></div>
+</div>
+
+<!-- ============ 04 DEPLOY ============ -->
+<div class="panel" id="p-deploy" role="tabpanel" hidden>
+  <section class="intro">
+    <h2>Deployment strategy</h2>
+    <p>On OroCloud you run every release from the maintenance node. <code>orocloud-cli</code> clones a tag, branch or commit from your repo, and only one operation runs at a time. <code>deploy</code> is the first install only; every later release is an <code>upgrade*</code> or <code>app:package:*</code> command.</p>
+  </section>
+
+  <section>
+    <h3>Three upgrade modes</h3>
+    <div class="modes">
+      <div class="mode">
+        <div class="h"><code class="big">upgrade</code><span class="tag acc">downtime</span></div>
+        <ol><li>Maintenance on, stop consumers, cron, websocket</li><li>Checkout + <code>composer install</code></li><li><code>oro:platform:update</code> incl. assets</li><li>Warm layout caches</li><li>Maintenance off</li></ol>
+        <p class="safe"><b>Use for</b> any change, including destructive migrations and LTS upgrades.</p>
+      </div>
+      <div class="mode">
+        <div class="h"><code class="big">upgrade:rolling</code><span class="tag ok">no downtime</span></div>
+        <ol><li>Checkout + composer</li><li>Build assets</li><li><code>oro:platform:update --skip-assets</code></li><li>Warm caches</li><li>Restart services</li></ol>
+        <p class="safe"><b>Use for</b> backward-compatible schema changes: no dropped or altered columns.</p>
+      </div>
+      <div class="mode">
+        <div class="h"><code class="big">upgrade:source</code><span class="tag ok">no downtime</span></div>
+        <ol><li>Checkout + composer</li><li>Build assets</li><li>Warm caches</li><li>Restart services</li></ol>
+        <p class="safe"><b>Use for</b> code-only changes. Skips <code>oro:platform:update</code>, so no new entities or fields.</p>
+      </div>
+    </div>
+    <p style="font-size:.88rem">All modes skip reindexing by default. Add <code>--schedule-search-reindexation</code> when needed; Oro requires a reindex for LTS-to-LTS upgrades.</p>
+  </section>
+
+  <section>
+    <h3>Pick the right command</h3>
+    <form class="picker" id="picker">
+      <fieldset>
+        <legend>What does this release change?</legend>
+        <div class="opts">
+          <label><input type="radio" name="chg" id="chg-code" value="code" checked> Code only</label>
+          <label><input type="radio" name="chg" id="chg-add" value="add"> Additive schema (new tables/fields)</label>
+          <label><input type="radio" name="chg" id="chg-break" value="break"> Destructive schema or LTS upgrade</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>How is it built?</legend>
+        <div class="opts">
+          <label><input type="radio" name="bld" id="bld-pkg" value="pkg" checked> Prebuilt app package</label>
+          <label><input type="radio" name="bld" id="bld-src" value="src"> Build on the server</label>
+        </div>
+      </fieldset>
+      <div class="verdict">
+        <div class="v" id="v-title"></div>
+        <p id="v-why" style="font-size:.9rem"></p>
+        <div class="cmd"><pre><code id="v-cmd"></code></pre><button class="copy" type="button">Copy</button></div>
+      </div>
+    </form>
+  </section>
+
+  <section>
+    <h3>Why app packages: Oro's own timing (vanilla 5.1 LTS)</h3>
+    <div class="bars" id="bars"></div>
+    <div class="legend-row"><span><i class="sw" style="background:var(--acc)"></i>maintenance mode (storefront down)</span><span><i class="sw" style="background:var(--oro-soft);border:1px solid var(--oro)"></i>total run time</span></div>
+    <p style="font-size:.86rem;color:var(--muted)">Packages are the OroCloud version of ACC's "build once, deploy the artifact". Build on stage, test, then promote the same package to prod. Custom migrations and catalogue size change these numbers.</p>
+  </section>
+
+  <section>
+    <h3>Pipeline side by side</h3>
+    <div class="vs">
+      <div class="col oro">
+        <h3><span class="tag oro">Oro</span> orocloud-cli</h3>
+        <ol>
+          <li><b>Trigger:</b> manual CLI on the maintenance node</li>
+          <li><code>pre_upgrade_commands</code> after the dry-run check</li>
+          <li><code>pre_maintenance_commands</code> (downtime mode only)</li>
+          <li><code>oro:platform:update --force</code> (migrations)</li>
+          <li><code>post_maintenance_commands</code></li>
+          <li>Services restart; <code>post_upgrade_commands</code></li>
+          <li>Layout cache warm-up</li>
+        </ol>
+        <div class="pc"><b class="p">Pros</b><span>Explicit control per release · promotable packages · maintenance vs emergency modes · backups built into the CLI</span></div>
+        <div class="pc"><b class="c">Cons</b><span>No push trigger, so CI needs VPN + SSH · rolling safety is your call · rollback is a full restore · patches dropped on upgrade</span></div>
+      </div>
+      <div class="col acc">
+        <h3><span class="tag acc">ACC</span> ece-tools</h3>
+        <ol>
+          <li><b>Trigger:</b> <code>git push</code> / merge or <code>environment:deploy</code></li>
+          <li><b>Build hook</b>: composer, DI compile, optional SCD. Site stays up; a failed build never deploys.</li>
+          <li><b>Deploy hook</b>: maintenance on, <code>setup:upgrade</code>, SCD if on deploy</li>
+          <li><b>Post-deploy hook</b>: cache clean, <code>WARM_UP_PAGES</code>, Fastly purge</li>
+          <li><b>Ideal state</b>: SCD on build + post_deploy hook + <code>config:dump</code></li>
+        </ol>
+        <div class="pc"><b class="p">Pros</b><span>CI-friendly git trigger · branch environments · automated near-zero downtime · <code>wizard:ideal-state</code> checks it</span></div>
+        <div class="pc"><b class="c">Cons</b><span><code>setup:upgrade</code> still needs brief maintenance · SCD strategy tuning · service changes need a ticket on Pro</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Rollback</h3>
+    <div class="tbl"><table class="narrow">
+      <thead><tr><th>Where it failed</th><th>Do this</th></tr></thead>
+      <tbody>
+        <tr><td>Before <code>oro:platform:update</code></td><td><code>orocloud-cli maintenance:off</code>. The database is untouched.</td></tr>
+        <tr><td>During or after migrations</td><td><code>orocloud-cli backup:restore &lt;date&gt;</code> restores DB and code and rebuilds caches. Then reindex. Media restores need support.</td></tr>
+        <tr><td>Code-only bug, no migrations ran</td><td>Redeploy the previous package with <code>app:package:deploy --source</code>. No instant blue/green rollback is documented <span class="tag unc">unconfirmed</span>.</td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:.9rem"><code>maintenance:on</code> stops the web server <b>and</b> consumers, cron and websocket. <code>emergency:on</code> puts only the web server in maintenance and keeps services running.</p>
+  </section>
+
+  <section>
+    <h3>Release runbook</h3>
+    <div class="cmd"><pre><code># 0. validate config
+orocloud-cli config:validate
+
+# 1. stage: build once, deploy, test
+orocloud-cli app:package:build &lt;tag&gt; --label="R-2026.11"
+orocloud-cli app:package:list
+orocloud-cli app:package:deploy --rolling &lt;package&gt;   # or no flag if destructive
+
+# 2. prod: back up, then promote the same package
+orocloud-cli backup:create --label=pre-R-2026.11
+orocloud-cli app:package:deploy --rolling &lt;package&gt;
+
+# 3. verify
+orocloud-cli log:list
+orocloud-cli log:view &lt;file&gt;
+orocloud-cli app:console "oro:website-search:reindex --scheduled"   # if needed</code></pre><button class="copy" type="button">Copy</button></div>
+  </section>
+
+  <section class="takeaways">
+    <h3>Key takeaways</h3>
+    <ul>
+      <li>Choose downtime per release: <code>upgrade</code>, <code>upgrade:rolling</code> or <code>upgrade:source</code>.</li>
+      <li>App packages cut maintenance from 800 s to 230 s in Oro's test.</li>
+      <li>Always <code>backup:create</code> before prod; rollback is <code>backup:restore</code> plus a reindex.</li>
+      <li>Upgrades remove <code>patch:apply</code> patches. Commit real fixes to the repo.</li>
+      <li>After a deploy, confirm consumers and cron are running.</li>
+    </ul>
+  </section>
+
+  <section class="quiz">
+    <div class="qbar"><h3>Self-test</h3><button type="button" data-reveal>Show all answers</button></div>
+    <details><summary><span class="q">Q1</span>Which mode skips <code>oro:platform:update</code>?<span class="r">tap</span></summary><div class="a"><code>upgrade:source</code>.</div></details>
+    <details><summary><span class="q">Q2</span>Your release drops a column. Which mode?<span class="r">tap</span></summary><div class="a"><code>upgrade</code> (or <code>app:package:deploy</code> without flags), with maintenance. Rolling is unsafe because old code may still read the column.</div></details>
+    <details><summary><span class="q">Q3</span>The upgrade failed before migrations ran. Fastest recovery?<span class="r">tap</span></summary><div class="a"><code>orocloud-cli maintenance:off</code>.</div></details>
+    <details><summary><span class="q">Q4</span>What is the Oro equivalent of ACC's "SCD on build"?<span class="r">tap</span></summary><div class="a">Prebuilt application packages (<code>app:package:build</code>) or pre-built assets.</div></details>
+    <details><summary><span class="q">Q5</span>Consumers must keep running during an incident. Which mode?<span class="r">tap</span></summary><div class="a"><code>emergency:on</code>. It only puts the web server in maintenance.</div></details>
+  </section>
+
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/basic-use/" target="_blank" rel="noopener">OroCloud Maintenance Commands</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/deploy-pre-built-assets/" target="_blank" rel="noopener">OroCloud: Deploy pre-built assets</a></li>
+    <li><a href="https://doc.oroinc.com/master/cloud/maintenance/maintenance-mode/" target="_blank" rel="noopener">OroCloud Maintenance Mode</a></li>
+    <li><a href="https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/" target="_blank" rel="noopener">Oro: Upgrade to a new version</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/develop/deploy/best-practices" target="_blank" rel="noopener">Adobe: Deployment best practices</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/develop/deploy/reduce-downtime" target="_blank" rel="noopener">Adobe: Reduce downtime</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/develop/deploy/static-content" target="_blank" rel="noopener">Adobe: Static content deployment</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/configure/app/properties/hooks-property" target="_blank" rel="noopener">Adobe: hooks property</a></li>
+  </ul></div>
+  <div class="next"><a href="#commands">Next: Commands →</a></div>
+</div>
+
+<!-- ============ 05 COMMANDS ============ -->
+<div class="panel" id="p-commands" role="tabpanel" hidden>
+  <section class="intro">
+    <h2>Command cheat sheet</h2>
+    <p>App commands run as <code>php bin/console &lt;cmd&gt; --env=prod</code> locally, or as <code>orocloud-cli app:console "&lt;cmd&gt;"</code> on OroCloud (1-hour timeout, 2 GB memory; quote anything with arguments).</p>
+  </section>
+  <section>
+    <div class="filters" id="filters">
+      <button type="button" class="chip" data-g="all" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-g="deploy" aria-pressed="false">Deploy</button>
+      <button type="button" class="chip" data-g="logs" aria-pressed="false">Debug &amp; logs</button>
+      <button type="button" class="chip" data-g="search" aria-pressed="false">Search</button>
+      <button type="button" class="chip" data-g="queue" aria-pressed="false">Queue &amp; cron</button>
+      <button type="button" class="chip" data-g="cache" aria-pressed="false">Cache</button>
+      <button type="button" class="chip" data-g="data" aria-pressed="false">Backup &amp; media</button>
+      <input type="search" id="cmd-q" placeholder="Filter, e.g. reindex" aria-label="Filter commands">
+    </div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section class="takeaways">
+    <h3>Key takeaways</h3>
+    <ul>
+      <li>Wrap any app command in <code>orocloud-cli app:console "…"</code> on OroCloud.</li>
+      <li>Storefront search is <code>oro:website-search:reindex</code>; use <code>--scheduled</code> in prod.</li>
+      <li>The cron entry point is <code>oro:cron</code>, not <code>oro:cron:run</code>.</li>
+      <li>Raw prod dumps can't be downloaded; use sanitized backups.</li>
+      <li>Not sure of a name? <code>orocloud-cli list</code> and <code>--help</code> are the source of truth.</li>
+    </ul>
+  </section>
+
+  <section class="quiz">
+    <div class="qbar"><h3>Self-test</h3><button type="button" data-reveal>Show all answers</button></div>
+    <details><summary><span class="q">Q1</span>How do you run <code>oro:user:list --all</code> on OroCloud?<span class="r">tap</span></summary><div class="a"><code>orocloud-cli app:console "oro:user:list --all"</code></div></details>
+    <details><summary><span class="q">Q2</span>Which reindex covers the storefront catalogue?<span class="r">tap</span></summary><div class="a"><code>oro:website-search:reindex</code>, with <code>--scheduled</code> in prod so consumers do the work.</div></details>
+    <details><summary><span class="q">Q3</span>How do you get prod data onto your laptop?<span class="r">tap</span></summary><div class="a"><code>orocloud-cli backup:create:sanitized</code>, then download it with scp.</div></details>
+    <details><summary><span class="q">Q4</span>A queue is stuck on a poisoned message. Which commands?<span class="r">tap</span></summary><div class="a"><code>orocloud-cli rabbitmq:queue:list</code>, then <code>rabbitmq:queue:purge</code> or <code>rabbitmq:queue:reroute</code>.</div></details>
+    <details><summary><span class="q">Q5</span>ACC <code>magento-cloud log deploy</code> becomes…?<span class="r">tap</span></summary><div class="a"><code>orocloud-cli log:list</code> and <code>orocloud-cli log:view &lt;file&gt;</code>.</div></details>
+  </section>
+
+  <div class="src"><b>Sources</b><ul>
+    <li><a href="https://doc.oroinc.com/master/cloud/maintenance/application-commands/" target="_blank" rel="noopener">OroCloud Application Commands</a></li>
+    <li><a href="https://doc.oroinc.com/cloud/maintenance/basic-use/" target="_blank" rel="noopener">OroCloud Maintenance Commands</a></li>
+    <li><a href="https://doc.oroinc.com/bundles/platform/SearchBundle/console-commands/" target="_blank" rel="noopener">SearchBundle commands</a> · <a href="https://doc.oroinc.com/bundles/commerce/WebsiteSearchBundle/console-commands/" target="_blank" rel="noopener">WebsiteSearchBundle commands</a></li>
+    <li><a href="https://doc.oroinc.com/bundles/platform/MessageQueueBundle/commands/" target="_blank" rel="noopener">MessageQueueBundle commands</a></li>
+    <li><a href="https://doc.oroinc.com/bundles/platform/TranslationBundle/commands/" target="_blank" rel="noopener">TranslationBundle commands</a> · <a href="https://doc.oroinc.com/bundles/platform/AssetBundle/commands/" target="_blank" rel="noopener">AssetBundle commands</a></li>
+    <li><a href="https://doc.oroinc.com/6.1/bundles/platform/LoggerBundle/" target="_blank" rel="noopener">LoggerBundle</a></li>
+    <li><a href="https://experienceleague.adobe.com/en/docs/commerce-on-cloud/user-guide/develop/test/log-locations" target="_blank" rel="noopener">Adobe: Log locations</a></li>
+  </ul></div>
+  <div class="next"><a href="#overview">Back to start ↺</a></div>
+</div>
+
+</div></main>
+
+<script>
+(function(){
+  /* ---------- tabs ---------- */
+  var TABS=['overview','architecture','mapping','clouds','deploy','commands'];
+  var tabs=[].slice.call(document.querySelectorAll('[role=tab]'));
+  function show(name,scroll){
+    if(TABS.indexOf(name)<0) name='overview';
+    tabs.forEach(function(b){var on=b.dataset.tab===name;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on&&b.scrollIntoView){try{b.scrollIntoView({block:'nearest',inline:'nearest'})}catch(e){}}});
+    document.querySelectorAll('.panel').forEach(function(p){p.hidden=p.id!=='p-'+name});
+    if(scroll){var nav=document.querySelector('nav.tabs');var y=nav.getBoundingClientRect().top+window.scrollY-2; if(window.scrollY>y) window.scrollTo(0,y);}
+  }
+  tabs.forEach(function(b){b.addEventListener('click',function(){var t=b.dataset.tab; if(location.hash.slice(1)===t) show(t,true); else location.hash=t;});});
+  document.querySelector('[role=tablist]').addEventListener('keydown',function(e){
+    var i=tabs.findIndex(function(b){return b.getAttribute('aria-selected')==='true'});
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();var n=(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[n].focus();tabs[n].click();}
+  });
+  window.addEventListener('hashchange',function(){show(location.hash.slice(1),true)});
+  show(location.hash.slice(1),false);
+
+  /* ---------- copy ---------- */
+  function sel(el){try{var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);}catch(e){}}
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('.copy'); if(b){
+      var code=b.parentElement.querySelector('code'); var txt=code.innerText;
+      var done=function(m){b.textContent=m;setTimeout(function(){b.textContent='Copy'},1600)};
+      try{navigator.clipboard.writeText(txt).then(function(){done('Copied')},function(){sel(code);done('Selected')});}catch(err){sel(code);done('Selected')}
+      return;
+    }
+    var r=e.target.closest('[data-reveal]'); if(r){
+      var ds=r.closest('.quiz').querySelectorAll('details'); var anyClosed=[].some.call(ds,function(d){return !d.open});
+      ds.forEach(function(d){d.open=anyClosed}); r.textContent=anyClosed?'Hide all answers':'Show all answers';
+    }
+  });
+
+  /* ---------- components ---------- */
+  var COMP={
+    edge:{name:'CDN / load balancer',role:'TLS termination, edge caching of static content, DDoS protection. GCP: Google CDN + LB or Cloudflare. OCI: Cloudflare.',scale:'Provider-managed. In the Cloudflare model, nginx balances across web nodes.',fail:'Site unreachable. With Cloudflare there is no public origin IP to fall back to.'},
+    waf:{name:'OroCloud WAF (nginx)',role:'Filters requests: Naxsi, testcookie bot check, rate limits, access_policy rules on IP, ASN, country, user agent and URI.',scale:'Runs on every web node. Rules live in orocloud.yaml and you edit them.',fail:'Bad rules return 451 (blocked) or 429/503 (rate limit) to real users and integrations.'},
+    web:{name:'Web nodes (nginx + PHP-FPM)',role:'Serve the storefront, back office, API and WebSocket (:8080).',scale:'Horizontal: at least 2 nodes in different zones. Oro resizes on request; exact process unconfirmed.',fail:'One node down: others keep serving. All down: full outage.'},
+    consumers:{name:'Job nodes / consumers',role:'Run oro:message-queue:consume: reindex, price recalculation, imports and exports, email.',scale:'Dedicated job servers, 4 consumers per queue per job server. Oro changes the layout after your approval.',fail:'Queues back up. Search, prices and emails go stale. The back office shows a "consumers not available" notice.'},
+    cron:{name:'Cron (oro:cron)',role:'Runs every minute and dispatches scheduled commands, many as queue messages. Custom jobs go in orocloud.yaml schedule.',scale:'Single scheduler. Which node runs it on OroCloud is unconfirmed.',fail:'Scheduled jobs stop: IMAP sync, cleanups, scheduled price lists.',unc:true},
+    pg:{name:'PostgreSQL',role:'System of record. Only supported DB since 5.1; 7.0 EE needs ≥ 18.3.',scale:'Primary + secondary in another zone with automatic failover. Vertical sizing by Oro.',fail:'Brief failover. Losing both instances is a full outage.'},
+    es:{name:'Elasticsearch',role:'Back-office index (oro_search) and storefront website index (oro_website_search). 7.0 EE: ≥ 9.2, < 10.',scale:'Cluster; Oro adds nodes.',fail:'Storefront search and product listings break; back-office search fails. Not in backups, so reindex after any restore.'},
+    redis:{name:'Redis + Sentinel',role:'App, Doctrine and layout caches and sessions, each on its own DSN.',scale:'Sentinel failover.',fail:'Sessions lost (users logged out) and cold caches slow every page.'},
+    mq:{name:'RabbitMQ',role:'Message broker for async work. 7.0 EE: ≥ 4.2.',scale:'Cluster that tolerates a single-node failure.',fail:'Async work stalls and producers may error. Not in backups.'},
+    gridfs:{name:'GridFS file storage',role:'Attachments, product images and other media.',scale:'Clustered (MongoDB GridFS).',fail:'Uploads and images fail. Media restores need a support request.'},
+    smtp:{name:'SMTP relay',role:'Outbound email through several relays with different priorities. Non-prod only delivers to allow-listed domains.',scale:'Active-active relays.',fail:'Email is delayed or not delivered.'},
+    maint:{name:'Maintenance node',role:'Where you run orocloud-cli: deploys, backups, logs, media. Reached via VPN (OpenVPN + MFA) → bridge → SSH.',scale:'Not scaled; one per environment.',fail:'You can’t deploy or run ops tasks. It is not in the storefront request path.',unc:true},
+    nat:{name:'NAT node',role:'Gives outbound calls a fixed egress IP that partners can allow-list.',scale:'Oro-managed.',fail:'Outbound integrations (ERP, payment, partner APIs) can’t connect.',unc:true}
+  };
+  var ORDER=['edge','waf','web','redis','pg','es','gridfs','mq','consumers','cron','smtp','maint','nat'];
+  var detail=document.getElementById('detail');
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  function pick(k){
+    var c=COMP[k]; if(!c) return;
+    detail.innerHTML='<h3>'+esc(c.name)+(c.unc?' <span class="tag unc">partly unconfirmed</span>':'')+'</h3>'+
+      '<div class="row"><span>Role</span><span>'+esc(c.role)+'</span></div>'+
+      '<div class="row"><span>Scaling</span><span>'+esc(c.scale)+'</span></div>'+
+      '<div class="row fail"><span>If it fails</span><span>'+esc(c.fail)+'</span></div>';
+    document.querySelectorAll('svg [data-k]').forEach(function(g){g.classList.toggle('on',g.dataset.k===k)});
+  }
+  var svg=document.querySelector('.diagram svg');
+  svg.addEventListener('click',function(e){var g=e.target.closest('[data-k]'); if(g) pick(g.dataset.k)});
+  svg.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){var g=e.target.closest('[data-k]'); if(g){e.preventDefault();pick(g.dataset.k)}}});
+  pick('web');
+  var tb=document.querySelector('#comp-table tbody');
+  ORDER.forEach(function(k){var c=COMP[k];var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+esc(c.name)+(c.unc?' <span class="tag unc">unconfirmed</span>':'')+'</td><td>'+esc(c.role)+'</td><td>'+esc(c.scale)+'</td><td>'+esc(c.fail)+'</td>';tb.appendChild(tr);});
+
+  /* ---------- picker ---------- */
+  var MODES={
+    code:{src:['orocloud-cli upgrade:source','Code-only release with no new entities or fields. No downtime.'],pkg:['orocloud-cli app:package:deploy --source <package>','Same as upgrade:source, using the package you tested on stage. No downtime.']},
+    add:{src:['orocloud-cli upgrade:rolling','Migrations run while the old code still serves, so they must be backward compatible. No downtime.'],pkg:['orocloud-cli app:package:deploy --rolling <package>','Rolling deploy of the tested package. Migrations must be additive. No downtime.']},
+    brk:{src:['orocloud-cli upgrade --reference=<tag>','Runs under maintenance mode so old code never sees the changed schema. Add --schedule-search-reindexation for LTS upgrades.'],pkg:['orocloud-cli app:package:deploy <package>','Maintenance window, but much shorter than building on the server. Reindex after LTS upgrades.']}
+  };
+  var form=document.getElementById('picker');
+  function upd(){
+    var chg=form.querySelector('input[name=chg]:checked').value; if(chg==='break') chg='brk';
+    var bld=form.querySelector('input[name=bld]:checked').value;
+    var m=MODES[chg][bld];
+    document.getElementById('v-title').textContent=m[0].replace(/ <.*$/,'').replace(/ --reference=.*$/,'');
+    document.getElementById('v-why').textContent=m[1];
+    var lines=['orocloud-cli backup:create --label=pre-<release>'];
+    if(bld==='pkg') lines.push('# package already built and tested on stage');
+    lines.push(m[0]);
+    lines.push('orocloud-cli log:list');
+    if(chg==='brk') lines.push('orocloud-cli app:console "oro:website-search:reindex --scheduled"');
+    document.getElementById('v-cmd').textContent=lines.join('\n');
+  }
+  form.addEventListener('change',upd); form.addEventListener('submit',function(e){e.preventDefault()}); upd();
+
+  /* ---------- timing bars ---------- */
+  var T=[['upgrade --reference=<ref>',1300,800],['app:package:upgrade <ref>',750,230],['app:package:deploy <package>',400,230]];
+  var bars=document.getElementById('bars');
+  T.forEach(function(t){
+    var tot=t[1]/1300*100, mm=t[2]/1300*100;
+    var d=document.createElement('div'); d.className='bar';
+    d.innerHTML='<code>'+esc(t[0])+'</code><div class="track"><div class="seg tot" style="width:'+tot+'%"></div><div class="seg mm" style="width:'+mm+'%"></div><span style="left:calc('+Math.min(tot,82)+'% + 6px)">'+t[2]+' s down · '+t[1]+' s total</span></div>';
+    bars.appendChild(d);
+  });
+
+  /* ---------- commands ---------- */
+  var C=[
+    ['deploy','Validate platform config','orocloud-cli config:validate\norocloud-cli config:help <key>','php vendor/bin/ece-tools cloud:config:validate','Before committing any orocloud.yaml change.',1],
+    ['deploy','First install','orocloud-cli deploy','# provisioned by Adobe at project creation','Once per environment. Runs oro:install and is blocked afterwards.'],
+    ['deploy','Upgrade with downtime','orocloud-cli upgrade --reference=<tag>','git push origin <branch>   # deploy hook runs','Destructive migrations and LTS upgrades.'],
+    ['deploy','Zero-downtime upgrade','orocloud-cli upgrade:rolling','git push   # with ideal state: SCD on build + post_deploy','Schema changes are additive and backward compatible.'],
+    ['deploy','Code-only deploy','orocloud-cli upgrade:source','# no direct equivalent','Hotfix with no entity or field changes.'],
+    ['deploy','Build and promote a package','orocloud-cli app:package:build <ref> --label="R-2026.11"\norocloud-cli app:package:list\norocloud-cli app:package:deploy [--rolling|--source] <package>\norocloud-cli app:package:upgrade <ref>','php vendor/bin/ece-tools build:generate\nphp vendor/bin/ece-tools build:transfer','Build once on stage, then deploy the same artifact to prod.'],
+    ['deploy','Run migrations','php bin/console oro:platform:update --force --env=prod\norocloud-cli app:schema:update --force','bin/magento setup:upgrade','Locally or for ad-hoc schema/data updates. Deploys run this for you.'],
+    ['deploy','Maintenance and emergency mode','orocloud-cli maintenance:on\norocloud-cli maintenance:off\norocloud-cli emergency:on\norocloud-cli emergency:off','bin/magento maintenance:enable\nbin/magento maintenance:disable','Maintenance stops consumers and cron too. Emergency keeps them running.'],
+    ['deploy','Apply a patch','orocloud-cli patch:apply','php vendor/bin/ece-patches apply','Urgent vendor fix. Removed by the next upgrade.',1],
+    ['deploy','Build front-end assets','php bin/console oro:assets:build\nphp bin/console assets:install','bin/magento setup:static-content:deploy -f','Local front-end work. Deploys build assets for you.'],
+    ['deploy','Deploy or promote an environment','# no branch environments: run orocloud-cli on each env','magento-cloud environment:deploy\nmagento-cloud environment:merge','ACC promotion flow. On Oro, promote packages instead.'],
+    ['logs','Deploy and operation logs','orocloud-cli log:list\norocloud-cli log:view <file>','magento-cloud log deploy\nphp vendor/bin/ece-tools error:show','A deploy or upgrade failed.'],
+    ['logs','Application and infra logs','# GCP console → Logs Explorer:\n# app prod, consumer, nginx-error, naxsi-error, php-fpm slow, pgsql','magento-cloud ssh -- "tail -n 200 var/log/exception.log"','Runtime errors, slow requests, WAF blocks. OCI log access is unconfirmed.'],
+    ['logs','Temporary debug logging','php bin/console oro:logger:level debug "1 hour" --user=admin@example.com','bin/magento setup:config:set --enable-debug-logging=true','Debug one user in prod without flooding logs.',1],
+    ['logs','Run any app command','orocloud-cli app:console "oro:user:list --all"','magento-cloud ssh -- php bin/magento <command>','Ad-hoc ops on OroCloud. Quote commands with arguments.'],
+    ['logs','Verbose output and help','orocloud-cli <command> -vvv\norocloud-cli <command> --help\norocloud-cli list','magento-cloud <command> -vvv','See exactly what an operation runs, or confirm a command name.'],
+    ['logs','Service credentials','orocloud-cli credentials --format=json','magento-cloud relationships\nmagento-cloud tunnel:open','Connect DB or search clients. Not available on prod.'],
+    ['logs','Shell access','# connect VPN (OpenVPN + MFA) first\nssh <user>@<maintenance-host>','magento-cloud ssh -e <env>','Any CLI work.'],
+    ['search','Back-office search index','php bin/console oro:search:reindex --scheduled\nphp bin/console oro:search:reindex --class=<FQCN>','bin/magento indexer:reindex','Admin search results are stale.'],
+    ['search','Storefront website index','php bin/console oro:website-search:reindex --scheduled\nphp bin/console oro:website-search:reindex --website-id=1 --ids="1-1000"','bin/magento indexer:reindex catalogsearch_fulltext','Catalogue changes, after a restore, after an LTS upgrade. Use --scheduled in prod.'],
+    ['search','Reindex on OroCloud','orocloud-cli search:reindex\norocloud-cli app:console "oro:website-search:reindex --scheduled"','# n/a','After restoring a backup or sanitized dump.'],
+    ['queue','Run a consumer manually','php bin/console oro:message-queue:consume --time-limit="+5 minutes" --memory-limit=700\norocloud-cli app:consumer oro.default','bin/magento queue:consumers:start <consumer>','Drain a queue by hand. app:consumer runs for about 2 minutes.'],
+    ['queue','Inspect or purge queues','orocloud-cli rabbitmq:queue:list\norocloud-cli rabbitmq:queue:purge\norocloud-cli rabbitmq:queue:reroute','magento-cloud tunnel:open   # then RabbitMQ admin','Stuck or poisoned messages. Check --help for arguments.'],
+    ['queue','Consumer status','orocloud-cli list   # find the "check consumers status" command','bin/magento queue:consumers:list','After every deploy: only consumers running before an upgrade run after it.',1],
+    ['queue','Cron','php bin/console oro:cron\nphp bin/console oro:cron:definitions:load','bin/magento cron:run','Scheduled jobs. Custom schedules go in orocloud.yaml schedule.'],
+    ['queue','Inspect MQ config','php bin/console debug:config oro_message_queue','# n/a','Tuning redelivery and consumer settings.'],
+    ['cache','Rebuild app cache on OroCloud','orocloud-cli cache:rebuild\n# 7.1 dev docs list instead:\norocloud-cli app:cache:clear','bin/magento cache:flush','After a config change or patch. Docs conflict; check orocloud-cli list.',1],
+    ['cache','Symfony cache','php bin/console cache:clear --env=prod\nphp bin/console cache:warmup --env=prod','bin/magento cache:clean','Local and dev environments.'],
+    ['cache','Layout render cache','php bin/console cache:pool:clear cache.oro_layout.render','bin/magento cache:clean full_page   # + Fastly purge','Stale storefront blocks.'],
+    ['cache','API cache','orocloud-cli app:cache:api','# n/a','After API configuration changes.'],
+    ['cache','Translations','orocloud-cli app:translation:update\nphp bin/console oro:translation:load --languages=de_DE --rebuild-cache','bin/magento i18n:pack <source> <locale>','New or updated translations.'],
+    ['data','Backups','orocloud-cli backup:create --label=pre-<release>\norocloud-cli backup:list\norocloud-cli backup:restore <date>','magento-cloud snapshot:create\nmagento-cloud snapshot:restore','Before every prod release, and for rollback. Reindex after restore.'],
+    ['data','Sanitized DB for local or stage','orocloud-cli backup:create:sanitized\norocloud-cli backup:list:sanitized\norocloud-cli backup:restore:sanitized <path>\norocloud-cli backup:delete:sanitized','php vendor/bin/ece-tools db-dump','Prod data for dev. Raw prod dumps can’t be downloaded.'],
+    ['data','Sync data between envs','orocloud-cli dump:load <timestamp>','magento-cloud environment:synchronize data','Refresh stage from prod.'],
+    ['data','Media files','orocloud-cli media:list --adapter=uploads\norocloud-cli media:download\norocloud-cli media:upload <dir>\norocloud-cli media:dump private','magento-cloud mount:download\nmagento-cloud mount:upload','Moving images and attachments in or out of GridFS.']
+  ];
+  var GN={deploy:'Deploy',logs:'Debug & logs',search:'Search',queue:'Queue & cron',cache:'Cache',data:'Backup & media'};
+  var cards=document.getElementById('cards'), q=document.getElementById('cmd-q'), cur='all';
+  function block(t){var d=document.createElement('div');d.className='cmd';var p=document.createElement('pre');var c=document.createElement('code');c.textContent=t;p.appendChild(c);d.appendChild(p);var b=document.createElement('button');b.type='button';b.className='copy';b.textContent='Copy';d.appendChild(b);return d;}
+  function side(lab,cls,t){var s=document.createElement('div');s.className='side';var l=document.createElement('span');l.className='lab '+cls;l.textContent=lab;s.appendChild(l);
+    if(/^#[^\n]*$/.test(t)){var n=document.createElement('span');n.className='note';n.textContent=t.replace(/^#\s*/,'');s.appendChild(n);} else s.appendChild(block(t));return s;}
+  function render(){
+    var term=(q.value||'').toLowerCase().trim(); cards.innerHTML=''; var n=0;
+    C.forEach(function(r){
+      if(cur!=='all'&&r[0]!==cur) return;
+      if(term&&(r.join(' ').toLowerCase().indexOf(term)<0)) return;
+      n++;
+      var a=document.createElement('article');a.className='cc';
+      var hd=document.createElement('div');hd.className='hd';hd.innerHTML='<h3>'+esc(r[1])+(r[5]?' <span class="tag unc">partly unconfirmed</span>':'')+'</h3><span class="grp">'+esc(GN[r[0]])+'</span>';
+      a.appendChild(hd);
+      var pr=document.createElement('div');pr.className='pair';pr.appendChild(side('Oro / OroCloud','o',r[2]));pr.appendChild(side('ACC','a',r[3]));a.appendChild(pr);
+      var w=document.createElement('div');w.className='when';w.innerHTML='<b>When to use:</b> '+esc(r[4]);a.appendChild(w);
+      cards.appendChild(a);
+    });
+    if(!n){var e=document.createElement('p');e.className='empty';e.textContent='No commands match. Clear the filter or pick another group.';cards.appendChild(e);}
+  }
+  document.getElementById('filters').addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;cur=b.dataset.g;
+    document.querySelectorAll('#filters .chip').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render();});
+  q.addEventListener('input',render);
+  render();
+})();
+</script>
+
+</body></html>
