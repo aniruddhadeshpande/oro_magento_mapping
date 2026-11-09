@@ -110,3 +110,8 @@ See **[oro-folder-structure.md](oro-folder-structure.md)**: top-level dirs, "whe
 
 ### Push to my own remote fails: "did not receive expected object … index-pack failed"
 The repo was a **shallow clone** (`git fetch --depth 1`). The missing object was the parent of the 5.1.8 commit, which the shallow clone cut off, and GitHub rejects a pushed history with missing parents. Fix: `git fetch --unshallow origin` (13 MB), then `git push -u local study`. Push only your branch and tag, not `--tags` (that would push all of Oro's release tags). Bonus: the `7.0.4` tag is now local, so `git diff 5.1.8 7.0.4` works.
+
+## Module 0B · Store Locator (feature on 5.1.8)
+
+### M1: my bundle isn't in `var/cache/prod/bundles.php`
+The folder was named `" Resources"` (leading space). `OroKernel::findBundles()` only matches `…/Resources/config/oro/bundles.yml` (`OroKernel.php:119,123`) and silently skips anything else, with no error. After renaming + `cache:clear`, the bundle appears, but not last: bundles are sorted by `priority` ascending, then alphabetically (`OroKernel::compareBundles()`, `:269`). `OroCookieConsentBundle` (1000) and `OroViewSwitcherBundle` (2000) load after ours (255).

@@ -18,7 +18,9 @@ services:
     <<: *php
     build: .docker/php-8.2
     ports: ["80:8000"]
-    command: symfony serve --no-tls --allow-all-ip --port=8000 --passthru=index.php
+    # Remove a stale pid file first: after a host reboot the restarted container still has it,
+    # and `symfony serve` would think it's already running, exit 0 and restart-loop.
+    command: sh -c 'rm -f "$$HOME"/.config/symfony-cli/var/*.pid && exec symfony serve --no-tls --allow-all-ip --port=8000 --passthru=index.php'
 
   consumer:
     <<: *php

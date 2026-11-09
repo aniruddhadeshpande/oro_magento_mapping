@@ -54,3 +54,4 @@ bin/*
 /.php-version
 /docker-compose.override.yml
 /.claude/settings.local.json
+/.vscode/
