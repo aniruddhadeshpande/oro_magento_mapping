@@ -1,6 +1,6 @@
 # Handoff: Oro study project
 
-_Last updated 2026-10-23. Branch `study`; `local/study` (GitHub `aniruddhadeshpande/oro_magento_mapping`) is at `6ed0842`. Newer local commits are **not pushed**._
+_Last updated 2026-11-09. Branch `study`; `local/study` (GitHub `aniruddhadeshpande/oro_magento_mapping`) is at `1feb864`. Newer local commits are **not pushed**._
 
 ## Goal
 Learn OroCommerce as a Magento 2 developer, by doing a **real upgrade**: install Oro **5.1.8** CE → build a custom feature → upgrade **directly to 7.0.4** (6.1.8 only as a fallback), and record what breaks. Teaching rules are in `CLAUDE.md`.
@@ -17,6 +17,10 @@ Learn OroCommerce as a Magento 2 developer, by doing a **real upgrade**: install
 | 10-21 | Docs: `notes/oro-folder-structure.md`, `notes/qa-log.md`. Updated `CLAUDE.md` for the new stack. |
 | 10-21 | Module 0B spec (`specs/0B-store-locator.md`) + request-flow diagrams (`notes/trace-request-flow.md`). |
 | 10-23 | Restarted the stack (the consumer needed a manual `docker compose restart consumer` to escape Docker's restart backoff). Added `restart: unless-stopped` to all 5 services via the override. Site 200, consumer idle, queue empty. |
+| 10-23 | Interactive request-flow page `notes/oro-request-flow.html` (D1–D3). Q&A log: Oro questions only. |
+| 11-09 | `php` restart-looped after reboot (stale symfony-cli pid file in the container) → override now deletes it before `symfony serve`. |
+| 11-09 | **M1 done:** `AcmeStoreLocatorBundle` + `bundles.yml` (priority 255). Gotcha: folder named `" Resources"` (leading space) was silently ignored. `oro-reviewer` now auto-fixes style nits. |
+| 11-09 | **M2 done:** `Entity/Store.php` (annotations, created/updated traits) + `AcmeStoreLocatorBundleInstaller` (`v1_0`). `acme_store` created, `oro_migrations` row, `doctrine:schema:update --dump-sql` = nothing to update. Not in `oro_entity_config` yet (needs `@Config`, M3). |
 
 ## Decisions
 - **Version path:** 5.1.8 → 7.0.4 directly, even though Oro may officially expect going through 6.x. Failures are the learning output.
@@ -55,8 +59,8 @@ Git: tags `5.1.8` (Oro), `baseline-5.1.8` (ours). Oro tags up to `7.0.4` are ava
 
 ## Next steps
 1. ~~Bring the stack up~~ (done 10-23).
-2. **M1 (in progress, the user is writing it):** `src/Acme/Bundle/StoreLocatorBundle/AcmeStoreLocatorBundle.php` + `Resources/config/oro/bundles.yml` (priority ~255), then `cache:clear` and `grep Acme var/cache/prod/bundles.php`. Review with `oro-reviewer`.
-3. M2 entity + installer migration → M3 admin CRUD + grid → M4 storefront `/stores` → M5 `pickupAvailable` extend field → M6 test data, tag `feature-5.1.8`, list expected breakages.
+2. ~~M1 bundle skeleton~~, ~~M2 entity + installer~~ (done 11-09).
+3. **M3 next:** `@Config` (+ ownership) on `Store` → `oro:entity-config:update`, admin controller, form type, `datagrids.yml`, `navigation.yml`, ACL, translations. Then M4 storefront `/stores` → M5 `pickupAvailable` extend field → M6 test data, tag `feature-5.1.8`, list expected breakages.
 4. **Phase 0C:** `pg_dump` + tag → read the 6.0/6.1/7.0 `UPGRADE.md` → PHP 8.5 / Node 24 / pnpm image → merge the 7.0.4 skeleton (`git diff 5.1.8 7.0.4`) → Postgres 13 → 18 dump/restore → `oro:platform:update` → log what breaks.
 5. Then Modules 1–5 (Bootstrapping, Database, Routing, Events, Checkout).
 
